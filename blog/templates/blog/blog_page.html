@@ -1,0 +1,65 @@
+{% extends 'wagtail/base.html' %}
+
+{% block wagtail_content %}
+<article class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <header class="mb-8">
+        <div class="flex items-center text-sm text-gray-500 mb-4">
+            <time datetime="{{ page.first_published_at|date:'Y-m-d' }}">
+                {{ page.first_published_at|date:"F j, Y" }}
+            </time>
+            {% if page.is_members_only %}
+            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                Members Only
+            </span>
+            {% endif %}
+        </div>
+        
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ page.title }}</h1>
+        
+        {% if page.intro %}
+        <p class="text-xl text-gray-600 mb-6">{{ page.intro }}</p>
+        {% endif %}
+        
+        {% if page.tags.all %}
+        <div class="flex flex-wrap gap-2">
+            {% for tag in page.tags.all %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                {{ tag.name }}
+            </span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </header>
+
+    <!-- Featured Image -->
+    {% if page.featured_image %}
+    <div class="mb-8">
+        {% image page.featured_image max-800x400 class="w-full rounded-lg shadow-lg" %}
+    </div>
+    {% endif %}
+
+    <!-- Content -->
+    <div class="prose prose-lg max-w-none">
+        {{ page.body|richtext }}
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 pt-8 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+                Published on {{ page.first_published_at|date:"F j, Y" }}
+                {% if page.last_published_at != page.first_published_at %}
+                • Updated on {{ page.last_published_at|date:"F j, Y" }}
+                {% endif %}
+            </div>
+            
+            <div class="flex space-x-4">
+                <a href="{% url 'core:home' %}" class="text-blue-600 hover:text-blue-800">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </footer>
+</article>
+{% endblock %}

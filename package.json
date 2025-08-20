@@ -1,0 +1,21 @@
+{
+  "name": "aquiles_django",
+  "version": "1.0.0",
+  "description": "I want to build a personal website where I can show the things I have done, what I am currently doing and learning, and where I can keep posting articles (in Blog format).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:css": "postcss static/src/styles.css -o static/css/tailwind.css",
+    "watch:css": "postcss static/src/styles.css -o static/css/tailwind.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^4.1.12"
+  }
+}

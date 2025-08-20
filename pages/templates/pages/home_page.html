@@ -1,0 +1,115 @@
+{% extends 'wagtail/base.html' %}
+
+{% block wagtail_content %}
+<!-- Hero Section -->
+<div class="text-center mb-12">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">
+        {{ page.hero_title|default:"Welcome to Aquiles' Personal Website" }}
+    </h1>
+    <p class="text-xl text-gray-600 mb-8">
+        {{ page.hero_subtitle|default:"Exploring technology, sharing knowledge, and building the future" }}
+    </p>
+    
+    {% if page.hero_image %}
+        <div class="mb-8">
+            {% image page.hero_image max-800x400 class="rounded-lg shadow-lg" %}
+        </div>
+    {% endif %}
+</div>
+
+<!-- About Section -->
+{% if page.about_content %}
+<div class="bg-white shadow rounded-lg p-8 mb-12">
+    <h2 class="text-3xl font-semibold text-gray-900 mb-6">
+        {{ page.about_title|default:"About Me" }}
+    </h2>
+    <div class="prose max-w-none">
+        {{ page.about_content|richtext }}
+    </div>
+</div>
+{% endif %}
+
+<!-- Featured Content -->
+<div class="grid md:grid-cols-2 gap-8">
+    <!-- Featured Blog Posts -->
+    {% if page.featured_blog_posts.all %}
+    <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-2xl font-semibold text-gray-900 mb-4">Latest Blog Posts</h3>
+        <div class="space-y-4">
+            {% for post in page.featured_blog_posts.all %}
+            <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                <h4 class="text-lg font-medium text-gray-900 mb-2">
+                    <a href="{% pageurl post %}" class="hover:text-blue-600">{{ post.title }}</a>
+                </h4>
+                <p class="text-gray-600 text-sm">{{ post.intro }}</p>
+                <p class="text-gray-500 text-xs mt-2">{{ post.first_published_at|date:"F j, Y" }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Featured Projects -->
+    {% if page.featured_projects.all %}
+    <div class="bg-white shadow rounded-lg p-6">
+        <h3 class="text-2xl font-semibold text-gray-900 mb-4">Featured Projects</h3>
+        <div class="space-y-4">
+            {% for project in page.featured_projects.all %}
+            <div class="border-b border-gray-200 pb-4 last:border-b-0">
+                <h4 class="text-lg font-medium text-gray-900 mb-2">
+                    <a href="{% pageurl project %}" class="hover:text-blue-600">{{ project.title }}</a>
+                </h4>
+                <p class="text-gray-600 text-sm">{{ project.summary }}</p>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                    {% if project.status == 'completed' %}bg-green-100 text-green-800
+                    {% elif project.status == 'in_progress' %}bg-blue-100 text-blue-800
+                    {% elif project.status == 'planning' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {{ project.get_status_display }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Contact Information -->
+{% if page.contact_email or page.contact_phone or page.social_links %}
+<div class="mt-12 bg-gray-50 rounded-lg p-8">
+    <h3 class="text-2xl font-semibold text-gray-900 mb-6">Get in Touch</h3>
+    <div class="grid md:grid-cols-2 gap-6">
+        {% if page.contact_email %}
+        <div>
+            <h4 class="font-medium text-gray-900 mb-2">Email</h4>
+            <a href="mailto:{{ page.contact_email }}" class="text-blue-600 hover:text-blue-800">
+                {{ page.contact_email }}
+            </a>
+        </div>
+        {% endif %}
+        
+        {% if page.contact_phone %}
+        <div>
+            <h4 class="font-medium text-gray-900 mb-2">Phone</h4>
+            <a href="tel:{{ page.contact_phone }}" class="text-blue-600 hover:text-blue-800">
+                {{ page.contact_phone }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if page.social_links %}
+    <div class="mt-6">
+        <h4 class="font-medium text-gray-900 mb-3">Follow Me</h4>
+        <div class="flex space-x-4">
+            {% for block in page.social_links %}
+            <a href="{{ block.value.url }}" class="text-gray-600 hover:text-gray-900" target="_blank" rel="noopener">
+                {{ block.value.platform }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

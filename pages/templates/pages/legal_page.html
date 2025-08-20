@@ -1,0 +1,33 @@
+{% extends 'wagtail/base.html' %}
+
+{% block wagtail_content %}
+<article class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <header class="mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ page.title }}</h1>
+        <div class="text-sm text-gray-500">
+            Last updated: {{ page.last_updated|date:"F j, Y" }}
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="prose prose-lg max-w-none">
+        {{ page.content|richtext }}
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 pt-8 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+                This document was last updated on {{ page.last_updated|date:"F j, Y" }}
+            </div>
+            
+            <div class="flex space-x-4">
+                <a href="{% url 'core:home' %}" class="text-blue-600 hover:text-blue-800">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </footer>
+</article>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'wagtail/base.html' %}
+
+{% block wagtail_content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ page.title }}</h1>
+        {% if page.intro %}
+        <div class="prose max-w-none text-gray-600">
+            {{ page.intro|richtext }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-12">
+        <!-- Contact Information -->
+        <div class="bg-white shadow rounded-lg p-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">{{ page.contact_form_title|default:"Get in Touch" }}</h2>
+            
+            <div class="space-y-6">
+                {% if page.email %}
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Email</h3>
+                    <a href="mailto:{{ page.email }}" class="text-blue-600 hover:text-blue-800">
+                        {{ page.email }}
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if page.phone %}
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Phone</h3>
+                    <a href="tel:{{ page.phone }}" class="text-blue-600 hover:text-blue-800">
+                        {{ page.phone }}
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if page.address %}
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Address</h3>
+                    <p class="text-gray-600">{{ page.address|linebreaks }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Social Links -->
+        {% if page.social_links %}
+        <div class="bg-white shadow rounded-lg p-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Follow Me</h2>
+            
+            <div class="space-y-4">
+                {% for block in page.social_links %}
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-gray-400">
+                            {% if block.value.icon %}
+                                {{ block.value.icon }}
+                            {% else %}
+                                📱
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="ml-4">
+                        <a href="{{ block.value.url }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-800 font-medium">
+                            {{ block.value.platform }}
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Contact Form Placeholder -->
+    <div class="mt-12 bg-gray-50 rounded-lg p-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Send a Message</h2>
+        <p class="text-gray-600 mb-6">
+            Contact form functionality can be added here. For now, please use the contact information above.
+        </p>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <span class="text-yellow-400">⚠️</span>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        Contact form integration will be implemented in a future phase.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'wagtail/base.html' %}
+
+{% block wagtail_content %}
+<article class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <header class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                {% if page.status == 'completed' %}bg-green-100 text-green-800
+                {% elif page.status == 'in_progress' %}bg-blue-100 text-blue-800
+                {% elif page.status == 'planning' %}bg-yellow-100 text-yellow-800
+                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                {{ page.get_status_display }}
+            </span>
+            {% if page.is_members_only %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                Members Only
+            </span>
+            {% endif %}
+        </div>
+        
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ page.title }}</h1>
+        
+        {% if page.summary %}
+        <p class="text-xl text-gray-600 mb-6">{{ page.summary }}</p>
+        {% endif %}
+    </header>
+
+    <!-- Featured Image -->
+    {% if page.featured_image %}
+    <div class="mb-8">
+        {% image page.featured_image max-800x400 class="w-full rounded-lg shadow-lg" %}
+    </div>
+    {% endif %}
+
+    <!-- Project Links -->
+    {% if page.project_url or page.github_url %}
+    <div class="mb-8 flex space-x-4">
+        {% if page.project_url %}
+        <a href="{{ page.project_url }}" target="_blank" rel="noopener" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            View Live Demo
+        </a>
+        {% endif %}
+        {% if page.github_url %}
+        <a href="{{ page.github_url }}" target="_blank" rel="noopener" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            View on GitHub
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Tech Stack -->
+    {% if page.tech_stack %}
+    <div class="mb-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Technologies Used</h2>
+        <div class="flex flex-wrap gap-2">
+            {% for tech in page.tech_stack %}
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                {{ tech.value }}
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Content -->
+    <div class="prose prose-lg max-w-none">
+        {{ page.description|richtext }}
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 pt-8 border-t border-gray-200">
+        <div class="flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+                Created on {{ page.first_published_at|date:"F j, Y" }}
+                {% if page.last_published_at != page.first_published_at %}
+                • Updated on {{ page.last_published_at|date:"F j, Y" }}
+                {% endif %}
+            </div>
+            
+            <div class="flex space-x-4">
+                <a href="{% url 'core:home' %}" class="text-blue-600 hover:text-blue-800">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </footer>
+</article>
+{% endblock %}
