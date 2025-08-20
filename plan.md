@@ -27,14 +27,14 @@
 - [x] Test page creation in Wagtail admin
 
 ### Phase 2 — Authentication and Membership
-- [ ] Set up Django's built-in authentication system
-- [ ] Create user registration form and view
-- [ ] Create login/logout views
-- [ ] Create "members" group with appropriate permissions
-- [ ] Add permission checks to gated content
-- [ ] Create user profile model (optional)
-- [ ] Test user registration and login flow
-- [ ] Test access control for exclusive content
+- [x] Set up Django's built-in authentication system
+- [x] Create user registration form and view
+- [x] Create login/logout views
+- [x] Create "members" group with appropriate permissions
+- [x] Add permission checks to gated content
+- [x] Create user profile model (optional)
+- [x] Test user registration and login flow
+- [x] Test access control for exclusive content
 
 ### Phase 3 — Templates and Tailwind CSS
 - [x] Initialize npm project
@@ -55,15 +55,15 @@
 - [x] Test responsive design on different screen sizes
 
 ### Phase 4 — Blog and Content Flow
-- [ ] Implement blog listing with pagination
-- [ ] Implement blog detail page
-- [ ] Add tag filtering functionality
-- [ ] Create RSS feed for blog posts
-- [ ] Add OpenGraph meta tags for social sharing
-- [ ] Add Twitter Card meta tags
-- [ ] Implement search functionality for blog posts
-- [ ] Add "related posts" feature
-- [ ] Test blog functionality end-to-end
+- [x] Implement blog listing with pagination
+- [x] Implement blog detail page
+- [x] Add tag filtering functionality
+- [x] Create RSS feed for blog posts
+- [x] Add OpenGraph meta tags for social sharing
+- [x] Add Twitter Card meta tags
+- [x] Implement search functionality for blog posts
+- [x] Add "related posts" feature
+- [x] Test blog functionality end-to-end
 
 ### Phase 5 — Testing and Quality Assurance
 - [ ] Write unit tests for all page models

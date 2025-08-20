@@ -52,7 +52,7 @@
     </div>
 
     <!-- Content Sections -->
-    <div class="grid md:grid-cols-2 gap-8">
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
         <!-- About Section -->
         <div class="bg-white shadow rounded-lg p-6">
             <h2 class="text-2xl font-semibold text-gray-900 mb-4">About Me</h2>
@@ -85,6 +85,53 @@
                 </li>
             </ul>
         </div>
+    </div>
+
+    <!-- Recent Blog Posts -->
+    <div class="bg-white shadow rounded-lg p-6 mb-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-900">Recent Blog Posts</h2>
+            <a href="{% url 'blog:blog_list' %}" class="text-blue-600 hover:text-blue-800">
+                View all posts →
+            </a>
+        </div>
+        
+        {% if recent_posts %}
+        <div class="grid md:grid-cols-3 gap-6">
+            {% for post in recent_posts %}
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+                {% if post.featured_image %}
+                <div class="aspect-w-16 aspect-h-9">
+                    {% image post.featured_image fill-300x200 class="w-full h-32 object-cover" %}
+                </div>
+                {% endif %}
+                
+                <div class="p-4">
+                    <div class="flex items-center text-xs text-gray-500 mb-2">
+                        <time datetime="{{ post.first_published_at|date:'Y-m-d' }}">
+                            {{ post.first_published_at|date:"M j, Y" }}
+                        </time>
+                        {% if post.is_members_only %}
+                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            Members
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <h3 class="font-semibold text-gray-900 mb-2">
+                        <a href="{% url 'blog:blog_detail' post.slug %}" class="hover:text-blue-600">
+                            {{ post.title }}
+                        </a>
+                    </h3>
+                    
+                    <p class="text-gray-600 text-sm">{{ post.intro|truncatewords:15 }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center py-8">No blog posts yet. Check back soon!</p>
+        {% endif %}
     </div>
 
     <!-- Authentication Status -->

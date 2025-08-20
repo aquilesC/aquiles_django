@@ -1,13 +1,18 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from blog.models import BlogPage
 
 # Create your views here.
 
 def home_view(request):
     """Home page view"""
+    # Get recent blog posts
+    recent_posts = BlogPage.objects.live().order_by('-first_published_at')[:3]
+    
     context = {
         'user': request.user,
         'is_member': request.user.groups.filter(name='members').exists() if request.user.is_authenticated else False,
+        'recent_posts': recent_posts,
     }
     return render(request, 'core/home.html', context)
 
