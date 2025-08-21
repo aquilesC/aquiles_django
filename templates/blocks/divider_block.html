@@ -1,0 +1,26 @@
+<section class="{% if value.spacing == 'small' %}py-4{% elif value.spacing == 'large' %}py-12{% else %}py-8{% endif %}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if value.divider_style == 'line' %}
+            <hr class="border-border" />
+            
+        {% elif value.divider_style == 'dots' %}
+            <div class="text-center">
+                <div class="inline-flex space-x-2">
+                    <div class="w-2 h-2 bg-fg-muted rounded-full"></div>
+                    <div class="w-2 h-2 bg-fg-muted rounded-full"></div>
+                    <div class="w-2 h-2 bg-fg-muted rounded-full"></div>
+                </div>
+            </div>
+            
+        {% elif value.divider_style == 'wave' %}
+            <div class="text-center text-fg-muted">
+                <svg class="w-16 h-4 mx-auto" viewBox="0 0 64 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 8C8 0 16 16 24 8C32 0 40 16 48 8C56 0 64 16 72 8" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+            </div>
+            
+        {% else %}
+            <!-- Just space, no visual element -->
+        {% endif %}
+    </div>
+</section>

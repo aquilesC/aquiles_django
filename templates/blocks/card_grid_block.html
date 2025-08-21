@@ -1,0 +1,53 @@
+{% load wagtailimages_tags %}
+
+<section class="py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if value.heading %}
+            <header class="mb-8">
+                <h2 class="font-serif text-2xl lg:text-3xl text-fg">{{ value.heading }}</h2>
+                {% if value.description %}
+                    <p class="mt-2 max-w-measure text-fg-muted">{{ value.description }}</p>
+                {% endif %}
+            </header>
+        {% endif %}
+        
+        <div class="grid sm:grid-cols-2 {% if value.columns == '3' %}lg:grid-cols-3{% elif value.columns == '4' %}lg:grid-cols-4{% else %}lg:grid-cols-2{% endif %} gap-6 lg:gap-8">
+            {% for card in value.cards %}
+                <article class="group rounded-xl border border-border bg-white shadow-sm transition hover:shadow-md">
+                    {% if card.link %}
+                        <a href="{{ card.link }}" class="block">
+                    {% endif %}
+                    
+                    {% if card.image %}
+                        {% image card.image fill-400x250 as card_image %}
+                        <img src="{{ card_image.url }}" alt="{{ card.image.title }}" class="aspect-[16/10] w-full rounded-t-xl object-cover" />
+                    {% endif %}
+                    
+                    <div class="p-5">
+                        <h3 class="font-serif text-lg text-fg {% if card.link %}group-hover:text-primary{% endif %}">
+                            {{ card.title }}
+                        </h3>
+                        <p class="mt-2 text-sm text-fg-muted line-clamp-3">
+                            {{ card.description }}
+                        </p>
+                        
+                        {% if card.link and card.link_text %}
+                            <div class="mt-4">
+                                <span class="inline-flex items-center text-sm font-medium text-primary group-hover:text-primary-600">
+                                    {{ card.link_text }}
+                                    <svg class="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if card.link %}
+                        </a>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    </div>
+</section>

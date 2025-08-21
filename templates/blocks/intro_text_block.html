@@ -1,0 +1,49 @@
+{% load wagtailcore_tags wagtailimages_tags %}
+
+<section class="py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if value.heading %}
+            <header class="mb-8">
+                <h2 class="font-serif text-2xl lg:text-3xl text-fg">{{ value.heading }}</h2>
+            </header>
+        {% endif %}
+        
+        <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {% if value.image and value.image_position == 'left' %}
+                <div class="order-1 lg:order-1">
+                    {% image value.image fill-600x400 as intro_image %}
+                    <img src="{{ intro_image.url }}" alt="{{ value.image.title }}" class="rounded-xl w-full" />
+                </div>
+            {% endif %}
+            
+            <div class="prose prose-slate max-w-none {% if value.image and value.image_position == 'left' %}order-2 lg:order-2{% elif value.image and value.image_position == 'right' %}order-1 lg:order-1{% endif %}">
+                {{ value.text|richtext }}
+            </div>
+            
+            {% if value.image and value.image_position == 'right' %}
+                <div class="order-2 lg:order-2">
+                    {% image value.image fill-600x400 as intro_image %}
+                    <img src="{{ intro_image.url }}" alt="{{ value.image.title }}" class="rounded-xl w-full" />
+                </div>
+            {% endif %}
+        </div>
+        
+        {% if value.image and value.image_position == 'top' %}
+            <div class="mb-8">
+                {% image value.image fill-1200x400 as intro_image %}
+                <img src="{{ intro_image.url }}" alt="{{ value.image.title }}" class="rounded-xl w-full" />
+            </div>
+            <div class="prose prose-slate max-w-none">
+                {{ value.text|richtext }}
+            </div>
+        {% elif value.image and value.image_position == 'bottom' %}
+            <div class="prose prose-slate max-w-none mb-8">
+                {{ value.text|richtext }}
+            </div>
+            <div>
+                {% image value.image fill-1200x400 as intro_image %}
+                <img src="{{ intro_image.url }}" alt="{{ value.image.title }}" class="rounded-xl w-full" />
+            </div>
+        {% endif %}
+    </div>
+</section>

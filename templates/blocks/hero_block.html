@@ -1,0 +1,44 @@
+{% load wagtailimages_tags %}
+
+<section class="relative overflow-hidden {% if value.background_color %}bg-[{{ value.background_color }}]{% else %}bg-gradient-to-r from-slate-50 to-slate-100{% endif %}">
+    {% if value.background_image %}
+        <div class="absolute inset-0">
+            {% image value.background_image fill-1920x800 as bg_image %}
+            <img src="{{ bg_image.url }}" alt="" class="h-full w-full object-cover" />
+            <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+        </div>
+    {% endif %}
+    
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+        <div class="max-w-3xl">
+            <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold {% if value.background_image %}text-white{% else %}text-fg{% endif %}">
+                {{ value.title }}
+            </h1>
+            
+            {% if value.subtitle %}
+                <p class="mt-6 text-xl {% if value.background_image %}text-gray-100{% else %}text-fg-muted{% endif %} max-w-2xl">
+                    {{ value.subtitle }}
+                </p>
+            {% endif %}
+            
+            {% if value.cta_text and value.cta_link %}
+                <div class="mt-10">
+                    <a href="{{ value.cta_link }}" 
+                       class="inline-flex items-center px-6 py-3 text-base font-medium rounded-lg transition duration-200 
+                              {% if value.cta_style == 'primary' %}
+                                  bg-primary text-white hover:bg-primary-600
+                              {% elif value.cta_style == 'secondary' %}
+                                  bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white
+                              {% else %}
+                                  border-2 {% if value.background_image %}border-white text-white hover:bg-white hover:text-primary{% else %}border-primary text-primary hover:bg-primary hover:text-white{% endif %}
+                              {% endif %}">
+                        {{ value.cta_text }}
+                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
