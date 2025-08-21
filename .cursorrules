@@ -1,136 +1,67 @@
+# AI Context Configuration
+
 You are an expert in Python, Django, Wagtail CMS, and modern web development with a focus on scalable, maintainable applications.
 
-## Key Principles
-- Write clear, technical responses with precise Django/Wagtail examples
-- Use Django's built-in features and Wagtail's CMS capabilities wherever possible
-- Prioritize readability and maintainability; follow Django's coding style guide (PEP 8 compliance)
-- Use descriptive variable and function names; adhere to naming conventions
-- Structure projects modularly using Django apps for reusability and separation of concerns
-- **Always create git commits after completing each phase or major feature**
+## Context Structure
 
-## Tech Stack & Architecture
-- **Django 5.2+** with modern Python practices
-- **Wagtail 7.1+** for content management
-- **Tailwind CSS v4** with PostCSS for styling
-- **SQLite** (development) / **PostgreSQL** (production)
-- **WhiteNoise** for static file serving
-- **DigitalOcean** for deployment
+This project uses a modular AI context system located in the `.ai/` directory. Each file provides focused context for specific aspects of the project:
 
-## Django/Wagtail Guidelines
-- Use Django's class-based views (CBVs) for complex views; function-based views (FBVs) for simple logic
-- Leverage Django's ORM and Wagtail's Page models for content management
-- Use Django's built-in user model and authentication framework
-- Utilize Django's form and model form classes for form handling
-- Follow MVT (Model-View-Template) pattern strictly
-- Use Wagtail's StreamField for flexible content blocks
-- Implement proper Wagtail page models with search indexing
+- **`@.ai/context.md`** - Context index and project overview
+- **`@.ai/architecture.md`** - Technical architecture and tech stack details
+- **`@.ai/guidelines.md`** - Development guidelines and coding standards
+- **`@.ai/project-structure.md`** - Detailed project organization
+- **`@.ai/workflows.md`** - Development workflows and processes
+- **`@.ai/features.md`** - Feature specifications and requirements
+- **`@.ai/security.md`** - Security practices and implementation
+- **`@.ai/performance.md`** - Performance optimization strategies
 
-## Frontend & Styling
-- **Tailwind CSS v4** with PostCSS for utility-first styling
-- Build process: `npm run build:css` and `npm run watch:css`
-- Source: `static/src/styles.css` → Output: `static/css/tailwind.css`
-- Responsive, mobile-first design approach
-- Use Tailwind's utility classes for consistent styling
-- Follow `visual_style.md` guidelines for design consistency
+## How to Use Context Files
 
-## Project Structure
+When working on specific aspects of the project:
+
+1. **Architecture & Setup**: Reference `@.ai/architecture.md` for tech stack and system design
+2. **Code Standards**: Use `@.ai/guidelines.md` for coding best practices and standards
+3. **Project Navigation**: Check `@.ai/project-structure.md` for file organization
+4. **Development Process**: Follow `@.ai/workflows.md` for git, testing, and deployment
+5. **Feature Development**: Consult `@.ai/features.md` for requirements and specifications
+6. **Security Implementation**: Reference `@.ai/security.md` for security practices
+7. **Performance Issues**: Use `@.ai/performance.md` for optimization strategies
+
+## Quick Reference
+
+**Project**: Aquiles Django - Modern Django + Wagtail CMS application
+**Focus**: Scalable content management with member-gated functionality
+**Stack**: Django 5.2+, Wagtail 7.1+, Tailwind CSS v4, PostgreSQL, DigitalOcean
+
+## Core Principles
+
+- **Modular Architecture**: Each Django app serves a single, clear purpose
+- **Code Quality**: Follow PEP 8, use descriptive names, maintain readability
+- **Git Workflow**: Always commit after completing each phase or major feature
+- **Security First**: Implement proper authentication, authorization, and data protection
+- **Performance Optimized**: Use Django ORM best practices and caching strategies
+- **Modern Frontend**: Tailwind CSS v4 with responsive, mobile-first design
+
+## Essential Commands
+
+```bash
+# Development setup
+python manage.py runserver
+npm run watch:css
+
+# Production build
+python manage.py collectstatic
+npm run build:css
+
+# Database operations
+python manage.py makemigrations
+python manage.py migrate
+
+# Testing
+python manage.py test
 ```
-aquiles_django/
-├── aquiles_site/          # Main Django project
-├── core/                  # Core functionality and home views
-├── blog/                  # Blog app with Wagtail pages
-├── pages/                 # Wagtail page models and templates
-├── accounts/              # Authentication and user management
-├── static/
-│   ├── src/              # Source CSS files
-│   └── css/              # Compiled CSS output
-├── templates/             # Base templates
-├── media/                 # User-uploaded files
-├── requirements.txt       # Python dependencies
-├── package.json          # Node.js dependencies
-├── postcss.config.mjs    # PostCSS configuration
-└── .gitignore           # Git ignore patterns
-```
 
-## Content Management
-- Use Wagtail's Page models for structured content
-- Implement proper content types: HomePage, BlogPage, ProjectPage, etc.
-- Use StreamField for flexible content blocks
-- Implement search functionality with Wagtail's search backend
-- Use tagging system for content organization
-- Implement members-only content gating
+For detailed information on any aspect of the project, reference the appropriate context file in the `.ai/` directory using the `@.ai/filename.md` syntax.
 
-## Authentication & Security
-- Django's built-in authentication system
-- User groups for access control (e.g., "members" group)
-- CSRF protection and security headers
-- Proper permission checks for gated content
-- Secure password validation
-
-## Static Files & Assets
-- Use WhiteNoise for static file serving in production
-- Configure `STATIC_ROOT` and `MEDIA_ROOT` properly
-- Use `collectstatic` for production deployment
-- Optimize images and assets for web
-
-## Development Workflow
-1. **Always create git commits after completing phases**
-2. Use virtual environments for Python dependencies
-3. Use npm for frontend dependencies
-4. Test locally before committing changes
-5. Follow semantic commit messages
-6. Keep dependencies updated and secure
-
-## Performance & Optimization
-- Use `select_related` and `prefetch_related` for database queries
-- Implement caching where beneficial
-- Optimize Wagtail page queries
-- Use database indexing for better performance
-- Optimize static file delivery
-
-## Deployment (DigitalOcean)
-- Use PostgreSQL for production database
-- Configure Gunicorn + Nginx for serving
-- Set up SSL certificates with Certbot
-- Use environment variables for sensitive settings
-- Implement proper logging and monitoring
-- Set up automated backups
-
-## Testing & Quality
-- Write unit tests for models and views
-- Test Wagtail page functionality
-- Validate templates and forms
-- Check responsive design across devices
-- Ensure accessibility compliance
-
-## Git Workflow
-- Create meaningful commit messages
-- Commit after each completed phase
-- Use feature branches for major changes
-- Keep commits atomic and focused
-- Document significant changes
-
-## Error Handling
-- Implement proper error pages (404, 500)
-- Use Django's built-in error handling
-- Log errors appropriately
-- Provide user-friendly error messages
-- Handle Wagtail-specific errors
-
-## Security Best Practices
-- Keep Django and dependencies updated
-- Use environment variables for secrets
-- Implement proper CSRF protection
-- Validate all user inputs
-- Use HTTPS in production
-- Follow OWASP security guidelines
-
-## Documentation
-- Maintain clear README files
-- Document API endpoints and models
-- Keep deployment instructions updated
-- Document environment setup
-- Maintain changelog for releases
-
-Remember: **Always commit your work after completing each phase or major feature implementation.**
+**Remember**: Always create git commits after completing each phase or major feature implementation.
   
