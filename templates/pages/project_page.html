@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ page.title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+    <!-- Project Header -->
+    <section class="py-12 lg:py-16 bg-bg-muted">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                <div>
+                    <h1 class="font-serif text-3xl lg:text-4xl font-bold text-fg">{{ page.title }}</h1>
+                    <p class="mt-4 text-lg text-fg-muted">{{ page.summary }}</p>
+                    
+                    <!-- Project Meta -->
+                    <div class="mt-6 flex flex-wrap items-center gap-4">
+                        <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary">
+                            {{ page.get_status_display }}
+                        </span>
+                        
+                        {% if page.project_url %}
+                            <a href="{{ page.project_url }}" target="_blank" rel="noopener noreferrer" 
+                               class="inline-flex items-center text-sm font-medium text-primary hover:text-primary-600">
+                                View Project
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>
+                        {% endif %}
+                        
+                        {% if page.github_url %}
+                            <a href="{{ page.github_url }}" target="_blank" rel="noopener noreferrer" 
+                               class="inline-flex items-center text-sm font-medium text-primary hover:text-primary-600">
+                                GitHub
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Tech Stack -->
+                    {% if page.tech_stack %}
+                        <div class="mt-6">
+                            <h3 class="text-sm font-medium text-fg mb-2">Technologies</h3>
+                            <div class="flex flex-wrap gap-2">
+                                {% for tech in page.tech_stack %}
+                                    <span class="inline-flex items-center rounded-md bg-gray-100 px-2.5 py-0.5 text-sm font-medium text-gray-800">
+                                        {{ tech.value }}
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if page.featured_image %}
+                    <div>
+                        {% image page.featured_image fill-600x400 as project_image %}
+                        <img src="{{ project_image.url }}" alt="{{ page.featured_image.title }}" class="rounded-xl w-full shadow-lg" />
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    
+    <!-- Project Content -->
+    {% for block in page.content %}
+        {% include_block block %}
+    {% endfor %}
+{% endblock %}

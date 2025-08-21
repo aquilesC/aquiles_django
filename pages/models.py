@@ -9,74 +9,61 @@ from modelcluster.fields import ParentalKey
 from modelcluster.models import ClusterableModel
 from taggit.models import TaggedItemBase
 from wagtail.snippets.models import register_snippet
+from .blocks import STREAMFIELD_BLOCKS
 
 
 class HomePage(Page):
-    """Home page model with hero section and featured content"""
+    """Home page model with flexible content blocks"""
     
-    hero_title = models.CharField(max_length=200, blank=True, help_text="Main hero title")
-    hero_subtitle = models.CharField(max_length=500, blank=True, help_text="Hero subtitle text")
-    hero_image = models.ForeignKey(
-        'wagtailimages.Image',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+',
-        help_text="Hero background image"
-    )
+    # StreamField for flexible content
+    content = StreamField(STREAMFIELD_BLOCKS, blank=True, use_json_field=True)
     
-    # Featured content
-    featured_blog_posts = models.ManyToManyField(
-        'blog.BlogPage',
-        blank=True,
-        related_name='featured_on_home',
-        help_text="Select blog posts to feature on the home page"
-    )
-    featured_projects = models.ManyToManyField(
-        'pages.ProjectPage',
-        blank=True,
-        related_name='featured_on_home',
-        help_text="Select projects to feature on the home page"
-    )
-    
-    # About section
-    about_title = models.CharField(max_length=200, blank=True, default="About Me")
-    about_content = RichTextField(blank=True, help_text="About section content")
-    
-    # Contact info
-    contact_email = models.EmailField(blank=True)
-    contact_phone = models.CharField(max_length=20, blank=True)
-    social_links = StreamField([
-        ('social_link', blocks.StructBlock([
-            ('platform', blocks.CharBlock(max_length=50)),
-            ('url', blocks.URLBlock()),
-            ('icon', blocks.CharBlock(max_length=50, help_text="Icon class or name")),
-        ])),
-    ], blank=True, use_json_field=True)
+    search_fields = Page.search_fields + [
+        index.SearchField('content'),
+    ]
     
     content_panels = Page.content_panels + [
-        MultiFieldPanel([
-            FieldPanel('hero_title'),
-            FieldPanel('hero_subtitle'),
-            FieldPanel('hero_image'),
-        ], heading="Hero Section"),
-        MultiFieldPanel([
-            FieldPanel('about_title'),
-            FieldPanel('about_content'),
-        ], heading="About Section"),
-        MultiFieldPanel([
-            FieldPanel('contact_email'),
-            FieldPanel('contact_phone'),
-            FieldPanel('social_links'),
-        ], heading="Contact Information"),
-        MultiFieldPanel([
-            FieldPanel('featured_blog_posts'),
-            FieldPanel('featured_projects'),
-        ], heading="Featured Content"),
+        FieldPanel('content'),
     ]
     
     class Meta:
         verbose_name = "Home Page"
+
+
+class AboutPage(Page):
+    """About page with flexible content blocks"""
+    
+    # StreamField for flexible content
+    content = StreamField(STREAMFIELD_BLOCKS, blank=True, use_json_field=True)
+    
+    search_fields = Page.search_fields + [
+        index.SearchField('content'),
+    ]
+    
+    content_panels = Page.content_panels + [
+        FieldPanel('content'),
+    ]
+    
+    class Meta:
+        verbose_name = "About Page"
+
+
+class ServicesPage(Page):
+    """Services/Offers page with flexible content blocks"""
+    
+    # StreamField for flexible content
+    content = StreamField(STREAMFIELD_BLOCKS, blank=True, use_json_field=True)
+    
+    search_fields = Page.search_fields + [
+        index.SearchField('content'),
+    ]
+    
+    content_panels = Page.content_panels + [
+        FieldPanel('content'),
+    ]
+    
+    class Meta:
+        verbose_name = "Services Page"
 
 
 class BlogIndexPage(Page):
@@ -126,10 +113,10 @@ class ProjectIndexPage(Page):
 
 
 class ProjectPage(Page):
-    """Individual project page"""
+    """Individual project page with flexible content"""
     
+    # Essential project info
     summary = models.CharField(max_length=500, help_text="Brief summary of the project")
-    description = RichTextField(help_text="Detailed project description")
     featured_image = models.ForeignKey(
         'wagtailimages.Image',
         null=True,
@@ -156,22 +143,25 @@ class ProjectPage(Page):
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='completed')
     
+    # Flexible content using StreamField
+    content = StreamField(STREAMFIELD_BLOCKS, blank=True, use_json_field=True, help_text="Main project content")
+    
     # Access control
     is_members_only = models.BooleanField(default=False, help_text="Make this project members-only")
     
     search_fields = Page.search_fields + [
         index.SearchField('summary'),
-        index.SearchField('description'),
+        index.SearchField('content'),
     ]
     
     content_panels = Page.content_panels + [
         FieldPanel('summary'),
-        FieldPanel('description'),
         FieldPanel('featured_image'),
         FieldPanel('tech_stack'),
         FieldPanel('project_url'),
         FieldPanel('github_url'),
         FieldPanel('status'),
+        FieldPanel('content'),
         FieldPanel('is_members_only'),
     ]
     

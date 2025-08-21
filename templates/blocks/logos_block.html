@@ -1,0 +1,33 @@
+{% load wagtailimages_tags %}
+
+<section class="py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if value.heading %}
+            <header class="mb-8 text-center">
+                <h2 class="font-serif text-2xl lg:text-3xl text-fg">{{ value.heading }}</h2>
+                {% if value.description %}
+                    <p class="mt-2 max-w-measure text-fg-muted mx-auto">{{ value.description }}</p>
+                {% endif %}
+            </header>
+        {% endif %}
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
+            {% for logo in value.logos %}
+                <div class="flex justify-center">
+                    {% if logo.link %}
+                        <a href="{{ logo.link }}" target="_blank" rel="noopener noreferrer" class="block transition hover:opacity-75">
+                    {% endif %}
+                    
+                    {% image logo.logo height-60 as logo_image %}
+                    <img src="{{ logo_image.url }}" 
+                         alt="{{ logo.company_name }}" 
+                         class="h-12 w-auto object-contain {% if value.grayscale %}grayscale hover:grayscale-0 transition duration-300{% endif %}" />
+                    
+                    {% if logo.link %}
+                        </a>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>

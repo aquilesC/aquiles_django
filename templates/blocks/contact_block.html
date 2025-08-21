@@ -1,0 +1,40 @@
+<section class="py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if value.heading %}
+            <header class="mb-8 text-center">
+                <h2 class="font-serif text-2xl lg:text-3xl text-fg">{{ value.heading }}</h2>
+                {% if value.description %}
+                    <p class="mt-2 max-w-measure text-fg-muted mx-auto">{{ value.description }}</p>
+                {% endif %}
+            </header>
+        {% endif %}
+        
+        {% if value.contact_type == 'both' %}
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Contact Form -->
+                <div>
+                    <h3 class="font-serif text-xl text-fg mb-6">{{ value.form_title|default:"Get in Touch" }}</h3>
+                    {% include 'blocks/partials/contact_form.html' %}
+                </div>
+                
+                <!-- Contact Information -->
+                <div>
+                    <h3 class="font-serif text-xl text-fg mb-6">Contact Information</h3>
+                    {% include 'blocks/partials/contact_info.html' with email=value.email phone=value.phone address=value.address %}
+                </div>
+            </div>
+            
+        {% elif value.contact_type == 'form' %}
+            <div class="max-w-2xl mx-auto">
+                <h3 class="font-serif text-xl text-fg mb-6 text-center">{{ value.form_title|default:"Get in Touch" }}</h3>
+                {% include 'blocks/partials/contact_form.html' %}
+            </div>
+            
+        {% else %}
+            <div class="max-w-2xl mx-auto text-center">
+                <h3 class="font-serif text-xl text-fg mb-6">Contact Information</h3>
+                {% include 'blocks/partials/contact_info.html' with email=value.email phone=value.phone address=value.address %}
+            </div>
+        {% endif %}
+    </div>
+</section>

@@ -1,0 +1,63 @@
+{% load wagtailcore_tags wagtailimages_tags block_tags %}
+
+<section class="py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if value.heading %}
+            <header class="mb-8">
+                <h2 class="font-serif text-2xl lg:text-3xl text-fg">{{ value.heading }}</h2>
+                {% if value.description %}
+                    <p class="mt-2 max-w-measure text-fg-muted">{{ value.description }}</p>
+                {% endif %}
+            </header>
+        {% endif %}
+        
+        {% get_blog_posts value as blog_posts %}
+        
+        {% if blog_posts %}
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                {% for post in blog_posts %}
+                    <article class="group rounded-xl border border-border bg-white shadow-sm transition hover:shadow-md">
+                        <a href="{% pageurl post %}" class="block">
+                            {% if value.show_images and post.featured_image %}
+                                {% image post.featured_image fill-400x250 as post_image %}
+                                <img src="{{ post_image.url }}" alt="{{ post.featured_image.title }}" class="aspect-[16/10] w-full rounded-t-xl object-cover" />
+                            {% endif %}
+                            
+                            <div class="p-5">
+                                <h3 class="font-serif text-lg text-fg group-hover:text-primary">
+                                    {{ post.title }}
+                                </h3>
+                                
+                                {% if value.show_excerpts and post.intro %}
+                                    <p class="mt-2 text-sm text-fg-muted line-clamp-3">
+                                        {{ post.intro }}
+                                    </p>
+                                {% endif %}
+                                
+                                <div class="mt-4 flex items-center justify-between">
+                                    <time class="text-xs text-fg-muted">
+                                        {{ post.first_published_at|date:"M j, Y" }}
+                                    </time>
+                                    
+                                    {% if post.tags.all %}
+                                        <div class="flex flex-wrap gap-1">
+                                            {% for tag in post.tags.all|slice:":2" %}
+                                                <span class="inline-flex items-center rounded-full bg-primary-50 px-2 py-1 text-xs font-medium text-primary">
+                                                    {{ tag.name }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <p class="text-fg-muted">No posts to display.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>

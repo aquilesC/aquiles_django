@@ -1,0 +1,48 @@
+{% load wagtailcore_tags %}
+
+<section class="py-12 lg:py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        {% if value.heading %}
+            <header class="mb-8 text-center">
+                <h2 class="font-serif text-2xl lg:text-3xl text-fg">{{ value.heading }}</h2>
+                {% if value.description %}
+                    <p class="mt-2 max-w-measure text-fg-muted mx-auto">{{ value.description }}</p>
+                {% endif %}
+            </header>
+        {% endif %}
+        
+        <div class="space-y-4">
+            {% for faq in value.faqs %}
+                <details class="group rounded-xl border border-border bg-white">
+                    <summary class="flex items-center justify-between p-6 cursor-pointer hover:bg-bg-muted transition">
+                        <h3 class="font-medium text-fg pr-4">{{ faq.question }}</h3>
+                        <svg class="w-5 h-5 text-fg-muted group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </summary>
+                    <div class="px-6 pb-6">
+                        <div class="prose prose-slate prose-sm max-w-none">
+                            {{ faq.answer|richtext }}
+                        </div>
+                    </div>
+                </details>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<script>
+// Ensure only one FAQ is open at a time (optional)
+document.addEventListener('DOMContentLoaded', function() {
+    const details = document.querySelectorAll('details');
+    details.forEach((targetDetail) => {
+        targetDetail.addEventListener('click', () => {
+            details.forEach((detail) => {
+                if (detail !== targetDetail) {
+                    detail.removeAttribute('open');
+                }
+            });
+        });
+    });
+});
+</script>

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block title %}{{ page.title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+    <!-- Blog Header -->
+    <article>
+        <header class="py-12 lg:py-16 bg-bg-muted">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h1 class="font-serif text-3xl lg:text-4xl font-bold text-fg">{{ page.title }}</h1>
+                <p class="mt-4 text-lg text-fg-muted">{{ page.intro }}</p>
+                
+                <div class="mt-6 flex items-center justify-between">
+                    <time class="text-sm text-fg-muted">
+                        {{ page.first_published_at|date:"F j, Y" }}
+                    </time>
+                    
+                    {% if page.tags.all %}
+                        <div class="flex flex-wrap gap-2">
+                            {% for tag in page.tags.all %}
+                                <span class="inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-sm font-medium text-primary">
+                                    {{ tag.name }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+        
+        {% if page.featured_image %}
+            <section class="py-8">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    {% image page.featured_image fill-1200x600 as featured_image %}
+                    <img src="{{ featured_image.url }}" alt="{{ page.featured_image.title }}" class="rounded-xl w-full shadow-lg" />
+                </div>
+            </section>
+        {% endif %}
+        
+        <!-- Blog Content -->
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+            {% for block in page.content %}
+                {% include_block block %}
+            {% endfor %}
+        </div>
+    </article>
+{% endblock %}

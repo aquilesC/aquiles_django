@@ -1,10 +1,11 @@
 from django.db import models
 from wagtail.models import Page
-from wagtail.fields import RichTextField
+from wagtail.fields import RichTextField, StreamField
 from wagtail.admin.panels import FieldPanel
 from wagtail.search import index
 from modelcluster.fields import ParentalKey
 from taggit.models import TaggedItemBase
+from pages.blocks import STREAMFIELD_BLOCKS
 
 
 class BlogPageTag(TaggedItemBase):
@@ -13,10 +14,9 @@ class BlogPageTag(TaggedItemBase):
 
 
 class BlogPage(Page):
-    """Individual blog post page"""
+    """Individual blog post page with flexible content"""
     
     intro = models.CharField(max_length=500, help_text="Brief introduction to the blog post")
-    body = RichTextField(help_text="Main content of the blog post")
     featured_image = models.ForeignKey(
         'wagtailimages.Image',
         null=True,
@@ -25,6 +25,10 @@ class BlogPage(Page):
         related_name='+',
         help_text="Featured image for the blog post"
     )
+    
+    # Flexible content using StreamField
+    content = StreamField(STREAMFIELD_BLOCKS, blank=True, use_json_field=True, help_text="Main blog content")
+    
     tags = models.ManyToManyField('taggit.Tag', through=BlogPageTag, blank=True)
     
     # SEO fields
@@ -35,13 +39,13 @@ class BlogPage(Page):
     
     search_fields = Page.search_fields + [
         index.SearchField('intro'),
-        index.SearchField('body'),
+        index.SearchField('content'),
     ]
     
     content_panels = Page.content_panels + [
         FieldPanel('intro'),
-        FieldPanel('body'),
         FieldPanel('featured_image'),
+        FieldPanel('content'),
         FieldPanel('tags'),
         FieldPanel('is_members_only'),
     ]
