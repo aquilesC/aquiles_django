@@ -6,6 +6,13 @@ from wagtail.models import Page
 from pages.models import HomePage
 from .models import BlogPage, BlogPageTag
 from taggit.models import Tag
+from django.test import TestCase, RequestFactory
+from django.contrib.auth import get_user_model
+from django.template import Context, Template
+from wagtail.models import Site
+from wagtail.test.utils import WagtailTestUtils
+from .models import BlogPage
+from .blocks import BlogBodyStreamBlock
 
 
 class BlogModelsTestCase(TestCase):
@@ -223,3 +230,83 @@ class BlogURLsTestCase(TestCase):
         """Test blog RSS feed URL pattern"""
         url = reverse('blog:blog_feed')
         self.assertEqual(url, '/blog/feed/')
+
+
+class BlogTemplateTagsTest(TestCase, WagtailTestUtils):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = get_user_model().objects.create_user(
+            username='testuser',
+            password='testpass123'
+        )
+        
+        # Get or create a test site
+        self.site, created = Site.objects.get_or_create(
+            hostname='localhost',
+            port=80,
+            defaults={
+                'is_default_site': True,
+                'root_page_id': 1
+            }
+        )
+        
+        # Create a test blog page
+        self.blog_page = BlogPage(
+            title="Test Blog Post",
+            slug="test-blog-post",
+            intro="This is a test blog post",
+            body=BlogBodyStreamBlock().to_python([
+                {
+                    'type': 'heading',
+                    'value': {
+                        'text': 'First Heading',
+                        'level': 'h2',
+                        'anchor': 'first-heading'
+                    }
+                },
+                {
+                    'type': 'paragraph',
+                    'value': '<p>This is a test paragraph.</p>'
+                },
+                {
+                    'type': 'heading',
+                    'value': {
+                        'text': 'Second Heading',
+                        'level': 'h3',
+                        'anchor': 'second-heading'
+                    }
+                }
+            ])
+        )
+        self.blog_page.save()
+
+    def test_extract_headings_filter(self):
+        """Test that headings are correctly extracted from StreamField content"""
+        template = Template('{% load blog_tags %}{{ page.body|extract_headings|length }}')
+        context = Context({'page': self.blog_page})
+        result = template.render(context)
+        self.assertEqual(result, '2')
+
+    def test_render_toc_filter(self):
+        """Test that table of contents is correctly rendered"""
+        headings = self.blog_page.body|extract_headings
+        template = Template('{% load blog_tags %}{{ headings|render_toc }}')
+        context = Context({'headings': headings})
+        result = template.render(context)
+        
+        # Check that the TOC contains the expected headings
+        self.assertIn('First Heading', result)
+        self.assertIn('Second Heading', result)
+        self.assertIn('first-heading', result)
+        self.assertIn('second-heading', result)
+
+    def test_blog_body_template_rendering(self):
+        """Test that the blog body template renders correctly"""
+        template = Template('{% load wagtailimages_tags wagtailcore_tags %}{% include "blog/blog_body.html" with value=page.body %}')
+        context = Context({'page': self.blog_page})
+        result = template.render(context)
+        
+        # Check that the content is rendered
+        self.assertIn('First Heading', result)
+        self.assertIn('This is a test paragraph', result)
+        self.assertIn('Second Heading', result)

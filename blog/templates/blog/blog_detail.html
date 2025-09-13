@@ -42,8 +42,8 @@
     {% endif %}
 
     <!-- Content -->
-    <div class="prose prose-lg max-w-none mb-12">
-        {{ post.body|richtext }}
+    <div class="mb-12">
+        {% include 'blog/blog_body.html' with value=post.body %}
     </div>
 
     <!-- Social Sharing -->

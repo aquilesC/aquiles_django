@@ -1,5 +1,5 @@
 {% extends 'wagtail/base.html' %}
-{% load wagtailimages_tags wagtailcore_tags %}
+{% load wagtailimages_tags wagtailcore_tags blog_tags %}
 
 {% block wagtail_content %}
 <article class="max-w-4xl mx-auto">
@@ -40,9 +40,16 @@
     </div>
     {% endif %}
 
+    <!-- Table of Contents -->
+    {% with headings=page.body|extract_headings %}
+        {% if headings %}
+            {{ headings|render_toc }}
+        {% endif %}
+    {% endwith %}
+
     <!-- Content -->
     <div class="prose prose-lg max-w-none">
-        {{ page.body|richtext }}
+        {% include "blog/blog_body.html" with value=page.body %}
     </div>
 
     <!-- Footer -->
