@@ -1,0 +1,84 @@
+{% load wagtailcore_tags %}
+
+<nav class="hidden md:flex space-x-8" aria-label="Main navigation">
+    {% for item in menu_items %}
+        <a href="{{ item.url }}" 
+           class="text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors duration-200
+                  {% if request.path == item.url %}text-blue-600 border-b-2 border-blue-600{% endif %}"
+           {% if item.is_external %}target="_blank" rel="noopener noreferrer"{% endif %}>
+            {{ item.title }}
+            {% if item.is_external %}
+                <svg class="inline w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                </svg>
+            {% endif %}
+        </a>
+    {% empty %}
+        <!-- Fallback navigation if no menu items -->
+        <a href="/" class="text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium">Home</a>
+        <a href="/blog/" class="text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium">Blog</a>
+        <a href="/contact/" class="text-gray-900 hover:text-blue-600 px-3 py-2 text-sm font-medium">Contact</a>
+    {% endfor %}
+</nav>
+
+<!-- Mobile menu button and dropdown -->
+<div class="md:hidden">
+    <button type="button" 
+            class="mobile-menu-button inline-flex items-center justify-center p-2 rounded-md text-gray-900 hover:text-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+            aria-expanded="false"
+            aria-controls="mobile-menu">
+        <span class="sr-only">Open main menu</span>
+        <!-- Hamburger icon -->
+        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+    
+    <!-- Mobile menu dropdown -->
+    <div class="mobile-menu hidden absolute top-full left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-50">
+        <div class="px-2 pt-2 pb-3 space-y-1">
+            {% for item in menu_items %}
+                <a href="{{ item.url }}" 
+                   class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-gray-50 rounded-md
+                          {% if request.path == item.url %}text-blue-600 bg-blue-50{% endif %}"
+                   {% if item.is_external %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                    {{ item.title }}
+                    {% if item.is_external %}
+                        <svg class="inline w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    {% endif %}
+                </a>
+            {% empty %}
+                <!-- Fallback navigation if no menu items -->
+                <a href="/" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-gray-50 rounded-md">Home</a>
+                <a href="/blog/" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-gray-50 rounded-md">Blog</a>
+                <a href="/contact/" class="block px-3 py-2 text-base font-medium text-gray-900 hover:text-blue-600 hover:bg-gray-50 rounded-md">Contact</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Mobile menu toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileMenuButton = document.querySelector('.mobile-menu-button');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', function() {
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    }
+});
+</script>

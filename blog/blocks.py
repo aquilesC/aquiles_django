@@ -1,6 +1,5 @@
 from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
-from wagtail.contrib.table_block.blocks import TableBlock
 
 # RichText feature set you’ll enable in settings/editor:
 RICH_FEATURES = ["bold", "italic", "link", "ol", "ul", "code", "h2", "h3", "h4"]
@@ -74,7 +73,6 @@ class BlogBodyStreamBlock(blocks.StreamBlock):
     callout = Callout()
     code = CodeBlock()
     embed = EmbedBlock()
-    table = TableBlock()
     divider = Divider()
 
     class Meta:
