@@ -1,0 +1,6 @@
+{% load i18n %}
+{% blocktrans with list_name=list.name %}Please confirm your subscription to {{ list_name }} by visiting the link below:{% endblocktrans %}
+
+{{ confirm_url }}
+
+{% blocktrans with site_name=site_name %}Thanks for joining {{ site_name }}. If you didn't request this email, you can ignore it.{% endblocktrans %}

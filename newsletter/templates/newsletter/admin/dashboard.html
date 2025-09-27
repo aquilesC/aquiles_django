@@ -1,0 +1,22 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="nice-padding">
+    <h1 class="wagtail-admin-title">{% trans "Newsletter dashboard" %}</h1>
+    <div class="w-panel__container" style="margin-top: 2rem;">
+        <div class="w-panel">
+            <div class="w-panel__header">
+                <h2 class="w-panel__heading">{% trans "Overview" %}</h2>
+            </div>
+            <div class="w-panel__content">
+                <ul class="listing">
+                    <li>{% trans "Total subscriptions" %}: {{ subscriptions }}</li>
+                    <li>{% trans "Active" %}: {{ active_subscriptions }}</li>
+                    <li>{% trans "Pending" %}: {{ pending_subscriptions }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
