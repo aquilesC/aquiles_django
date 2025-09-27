@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Unsubscribe" %} · {{ block.super }}{% endblock %}
+
+{% block content %}
+<section class="max-w-2xl mx-auto bg-white shadow rounded-lg p-8">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-4">{% blocktrans with list_name=subscription.subscription_list.name %}Unsubscribe from {{ list_name }}{% endblocktrans %}</h1>
+    <p class="text-gray-600 mb-6">{% trans "We're sorry to see you go. Confirm below to stop receiving emails." %}</p>
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        <div class="flex items-center space-x-3">
+            {{ form.confirm }}
+            <label for="{{ form.confirm.id_for_label }}" class="text-sm text-gray-700">{% trans "Yes, unsubscribe me" %}</label>
+        </div>
+        <div>
+            <label for="{{ form.reason.id_for_label }}" class="block text-sm font-medium text-gray-700">{% trans "Reason (optional)" %}</label>
+            {{ form.reason }}
+        </div>
+        <button type="submit" class="inline-flex items-center px-5 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+            {% trans "Unsubscribe" %}
+        </button>
+    </form>
+</section>
+{% endblock %}

@@ -2,6 +2,8 @@ from wagtail import blocks
 from wagtail.images.blocks import ImageChooserBlock
 from wagtail.documents.blocks import DocumentChooserBlock
 
+from newsletter.blocks import NewsletterSignupBlock
+
 
 class HeroBlock(blocks.StructBlock):
     """Hero section with title, subtitle, background image/color, and CTA"""
@@ -268,4 +270,5 @@ STREAMFIELD_BLOCKS = [
     ('faq', FAQBlock()),
     ('contact', ContactBlock()),
     ('divider', DividerBlock()),
+    ('newsletter_signup', NewsletterSignupBlock()),
 ]

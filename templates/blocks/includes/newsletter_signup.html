@@ -1,0 +1,79 @@
+<section class="py-8 px-6 rounded-xl shadow-sm {{ bg_class }}">
+    {% if value.heading %}
+        <h2 class="text-2xl font-semibold mb-2 {{ text_class }}">{{ value.heading }}</h2>
+    {% endif %}
+    {% if subheading %}
+        <p class="mb-6 text-sm {{ accent_class }}">{{ subheading }}</p>
+    {% endif %}
+    <form action="{% url 'newsletter:subscribe' %}" method="post" class="space-y-4">
+        {% csrf_token %}
+        <input type="hidden" name="source" value="streamfield">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="allow_multiple" value="{% if allow_multiple %}1{% else %}0{% endif %}">
+        <input type="hidden" name="show_name" value="{% if show_name_fields %}1{% else %}0{% endif %}">
+        <input type="hidden" name="success_message" value="{{ success_message }}">
+        {% if not allow_multiple or value.lists|length <= 1 %}
+            {% for list_id in list_ids %}
+                <input type="hidden" name="lists" value="{{ list_id }}">
+            {% endfor %}
+        {% endif %}
+        {% if allow_multiple and value.lists|length > 1 %}
+            <div class="grid grid-cols-1 gap-2">
+                <span class="text-sm font-medium {{ text_class }}">{% trans "Choose newsletters" %}</span>
+                {% for list_obj in value.lists %}
+                    <label class="flex items-center space-x-2 text-sm {{ accent_class }}">
+                        <input type="checkbox" name="lists" value="{{ list_obj.pk }}" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" checked>
+                        <span>{{ list_obj.name }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if layout == 'inline' %}
+            <div class="grid gap-4 md:grid-cols-{% if show_name_fields %}4{% else %}2{% endif %}">
+                <div class="md:col-span-1">
+                    <label class="block text-sm font-medium {{ text_class }}" for="{{ form_id }}-email">{% trans "Email" %}</label>
+                    <input id="{{ form_id }}-email" type="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                {% if show_name_fields %}
+                    <div>
+                        <label class="block text-sm font-medium {{ text_class }}" for="{{ form_id }}-first">{% trans "First name" %}</label>
+                        <input id="{{ form_id }}-first" type="text" name="first_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium {{ text_class }}" for="{{ form_id }}-last">{% trans "Last name" %}</label>
+                        <input id="{{ form_id }}-last" type="text" name="last_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                {% endif %}
+                <div class="flex items-end">
+                    <button type="submit" class="w-full inline-flex justify-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm {% if button_variant == 'light' %}text-indigo-600 bg-white hover:bg-indigo-100{% else %}text-white bg-indigo-600 hover:bg-indigo-700{% endif %} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {{ button_text }}
+                    </button>
+                </div>
+            </div>
+        {% else %}
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium {{ text_class }}" for="{{ form_id }}-email">{% trans "Email" %}</label>
+                    <input id="{{ form_id }}-email" type="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                {% if show_name_fields %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium {{ text_class }}" for="{{ form_id }}-first">{% trans "First name" %}</label>
+                            <input id="{{ form_id }}-first" type="text" name="first_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium {{ text_class }}" for="{{ form_id }}-last">{% trans "Last name" %}</label>
+                            <input id="{{ form_id }}-last" type="text" name="last_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                {% endif %}
+                <div>
+                    <button type="submit" class="inline-flex items-center px-4 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm {% if button_variant == 'light' %}text-indigo-600 bg-white hover:bg-indigo-100{% else %}text-white bg-indigo-600 hover:bg-indigo-700{% endif %} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        {{ button_text }}
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </form>
+</section>

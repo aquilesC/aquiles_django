@@ -1,0 +1,37 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{% trans "Confirm your subscription" %}</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f5; padding: 32px;">
+    <table width="100%%" cellpadding="0" cellspacing="0" role="presentation">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" role="presentation" style="background: #ffffff; border-radius: 12px; overflow: hidden;">
+                    <tr>
+                        <td style="background-color: #312e81; color: #ffffff; padding: 32px;">
+                            <h1 style="margin: 0; font-size: 24px;">{% blocktrans with list_name=list.name %}Confirm your subscription to {{ list_name }}{% endblocktrans %}</h1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 32px; color: #1f2937;">
+                            <p style="font-size: 16px; line-height: 1.5;">{% blocktrans with site_name=site_name %}Thanks for your interest in {{ site_name }}. Please confirm your email address to start receiving updates.{% endblocktrans %}</p>
+                            <p style="text-align: center; margin: 32px 0;">
+                                <a href="{{ confirm_url }}" style="background: #4338ca; color: #ffffff; padding: 14px 24px; border-radius: 999px; text-decoration: none; font-weight: bold;">{% trans "Confirm email" %}</a>
+                            </p>
+                            <p style="font-size: 14px; color: #6b7280;">{% trans "If you didn't sign up for this list you can safely ignore this email." %}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background: #f9fafb; padding: 24px; text-align: center; color: #6b7280; font-size: 12px;">
+                            <p style="margin: 0;">{% blocktrans with unsubscribe_url=unsubscribe_url %}You can <a href="{{ unsubscribe_url }}">unsubscribe</a> at any time.{% endblocktrans %}</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

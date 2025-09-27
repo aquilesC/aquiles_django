@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -35,7 +36,8 @@ INSTALLED_APPS = [
     'blog',
     'accounts',
     'pages',
-    
+    'newsletter',
+
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
     'wagtail.embeds',
@@ -47,10 +49,12 @@ INSTALLED_APPS = [
     'wagtail.search',
     'wagtail.admin',
     'wagtail',
-    
+
     'modelcluster',
     'taggit',
-    
+
+    'anymail',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -155,6 +159,24 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'newsletters@example.com')
+
+ANYMAIL = {
+    'MAILGUN_API_KEY': os.environ.get('MAILGUN_API_KEY', ''),
+    'MAILGUN_SENDER_DOMAIN': os.environ.get('MAILGUN_DOMAIN', ''),
+    'MAILGUN_WEBHOOK_SIGNING_KEY': os.environ.get('MAILGUN_WEBHOOK_SIGNING_KEY', ''),
+    'WEBHOOK_SECRET': os.environ.get('MAILGUN_WEBHOOK_SECRET', ''),
+}
+
+# Celery configuration
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'redis://localhost:6379/1')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
 # Wagtail settings
 WAGTAIL_SITE_NAME = 'Aquiles Personal Website'
 
@@ -168,3 +190,7 @@ WAGTAILSEARCH_BACKENDS = {
 
 # Base URL to use when referring to full URLs within the Wagtail admin backend
 WAGTAILADMIN_BASE_URL = 'http://example.com'
+
+# Newsletter settings
+NEWSLETTER_CONFIRMATION_EXPIRY_DAYS = int(os.environ.get('NEWSLETTER_CONFIRMATION_EXPIRY_DAYS', '7'))
+NEWSLETTER_BASE_URL = os.environ.get('NEWSLETTER_BASE_URL', '')

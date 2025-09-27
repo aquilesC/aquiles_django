@@ -1,0 +1,14 @@
+{% load i18n %}
+{% if background == "muted" %}
+    {% with bg_class="bg-gray-50" text_class="text-gray-900" accent_class="text-gray-600" button_variant="primary" %}
+        {% include "blocks/includes/newsletter_signup.html" %}
+    {% endwith %}
+{% elif background == "primary" %}
+    {% with bg_class="bg-indigo-600" text_class="text-white" accent_class="text-indigo-100" button_variant="light" %}
+        {% include "blocks/includes/newsletter_signup.html" %}
+    {% endwith %}
+{% else %}
+    {% with bg_class="bg-white" text_class="text-gray-900" accent_class="text-gray-600" button_variant="primary" %}
+        {% include "blocks/includes/newsletter_signup.html" %}
+    {% endwith %}
+{% endif %}

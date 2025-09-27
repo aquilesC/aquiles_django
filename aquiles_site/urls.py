@@ -23,6 +23,7 @@ from wagtail import urls as wagtail_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
+    path('newsletter/', include('newsletter.urls', namespace='newsletter')),
     path('cms/', include(wagtail_urls)),
     path('', include('core.urls')),
 ]

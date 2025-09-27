@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Newsletter" %} · {{ block.super }}{% endblock %}
+
+{% block content %}
+<section class="max-w-3xl mx-auto bg-white shadow rounded-lg p-8">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-4">{% trans "Join the newsletter" %}</h1>
+    <p class="text-gray-600 mb-6">{% trans "Get updates, essays, and resources directly in your inbox." %}</p>
+    <form method="post" action="" class="space-y-6">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="rounded-md bg-red-50 border border-red-200 p-4 text-red-700">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div>
+                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">{% trans "Email address" %}</label>
+                {{ form.email }}
+                {% for error in form.email.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+            <div>
+                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">{% trans "First name" %}</label>
+                {{ form.first_name }}
+                {% for error in form.first_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+            <div>
+                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">{% trans "Last name" %}</label>
+                {{ form.last_name }}
+                {% for error in form.last_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+        </div>
+        {% if form.lists.field.widget.__class__.__name__ != 'MultipleHiddenInput' %}
+            <div>
+                <span class="block text-sm font-medium text-gray-700">{% trans "Choose newsletters" %}</span>
+                <div class="mt-2 space-y-3">
+                    {% for choice in form.lists %}
+                        <label class="flex items-start space-x-3">
+                            {{ choice.tag }}
+                            <span class="text-sm text-gray-700">{{ choice.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                {% for error in form.lists.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ form.lists }}
+        {% endif %}
+        {{ form.source }}
+        {{ form.next }}
+        {{ form.success_message }}
+        <div class="flex justify-end">
+            <button type="submit" class="inline-flex items-center px-5 py-3 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                {% trans "Subscribe" %}
+            </button>
+        </div>
+    </form>
+</section>
+{% endblock %}
