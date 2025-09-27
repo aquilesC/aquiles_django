@@ -43,11 +43,16 @@ class MailgunTrackingWebhookView(BaseMailgunWebhook):
             subscription.status = Subscription.Status.BOUNCED
             subscription.save(update_fields=["status", "updated_at"])
         elif event_type in {"complained", "unsubscribed"}:
-            updates.update({"status": EmailMessageLog.Status.BOUNCED})
+            # Don't update EmailMessageLog status for these events - they represent user actions
+            # after successful delivery, not delivery failures
             subscription = log.subscription
             subscription.status = Subscription.Status.COMPLAINED if event_type == "complained" else Subscription.Status.UNSUBSCRIBED
-            subscription.unsubscribed_at = timestamp if event_type == "unsubscribed" else subscription.unsubscribed_at
-            subscription.save(update_fields=["status", "unsubscribed_at", "updated_at"])
+            if event_type == "unsubscribed":
+                subscription.unsubscribed_at = timestamp
+                subscription.save(update_fields=["status", "unsubscribed_at", "updated_at"])
+            else:
+                # For "complained" events, don't update unsubscribed_at
+                subscription.save(update_fields=["status", "updated_at"])
         if len(updates) > 1:
             for field, value in updates.items():
                 setattr(log, field, value)
