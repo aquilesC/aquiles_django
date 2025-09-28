@@ -483,13 +483,19 @@ class NewsletterWorkspaceView(AdminAccessMixin, TemplateView):
                             _("Campaign saved but scheduling failed: {error}").format(error=str(exc)),
                         )
                 else:
-                    # Derive status based on send time when not scheduling automatically
+                    # When not auto-scheduling, only set status to SCHEDULED if we actually schedule the task
+                    # Otherwise, keep the existing status or set to DRAFT for new campaigns
                     if campaign.send_at and campaign.send_at > timezone.now():
-                        campaign.status = Campaign.Status.SCHEDULED
-                        campaign.save(update_fields=["status", "updated_at"])
-                    elif campaign.status != Campaign.Status.DRAFT:
-                        campaign.status = Campaign.Status.DRAFT
-                        campaign.save(update_fields=["status", "updated_at"])
+                        # Only set to SCHEDULED if we're actually scheduling the task
+                        # Since auto_schedule is False, we don't schedule, so keep as DRAFT
+                        if campaign.status == Campaign.Status.DRAFT:
+                            # Only update if it's a new campaign (DRAFT status)
+                            campaign.save(update_fields=["updated_at"])
+                    else:
+                        # For campaigns without future send_at, only set to DRAFT if it's a new campaign
+                        if campaign.status == Campaign.Status.DRAFT:
+                            campaign.save(update_fields=["updated_at"])
+                    
                     messages.success(
                         request,
                         _("Campaign '{name}' saved.").format(name=campaign.name),
