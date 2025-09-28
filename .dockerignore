@@ -1,0 +1,13 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+node_modules
+static/css/tailwind.css
+deploy/.data
+deploy/env/.env*
+deploy/scripts/*.sh

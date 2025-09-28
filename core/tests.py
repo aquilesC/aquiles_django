@@ -29,7 +29,7 @@ class CoreViewsTestCase(TestCase):
         self.home_page = HomePage(
             title="Test Home",
             slug="test-home",
-            about_content="<p>Test about content</p>"
+            content=[]
         )
         self.root_page.add_child(instance=self.home_page)
         self.home_page.save_revision().publish()
@@ -39,7 +39,7 @@ class CoreViewsTestCase(TestCase):
             title="Test Blog Post 1",
             slug="test-blog-1",
             intro="Test intro 1",
-            body="<p>Test body 1</p>",
+            content=[],
             is_members_only=False
         )
         self.home_page.add_child(instance=self.blog_post1)
@@ -49,7 +49,7 @@ class CoreViewsTestCase(TestCase):
             title="Test Blog Post 2",
             slug="test-blog-2",
             intro="Test intro 2",
-            body="<p>Test body 2</p>",
+            content=[],
             is_members_only=True
         )
         self.home_page.add_child(instance=self.blog_post2)
@@ -107,6 +107,13 @@ class CoreViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'This is exclusive content for members only!')
 
+    def test_healthcheck_ok(self):
+        response = self.client.get('/healthz/')
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload['status'], 'ok')
+        self.assertIn('database', payload['checks'])
+
 
 class CoreModelsTestCase(TestCase):
     def test_home_page_creation(self):
@@ -115,12 +122,12 @@ class CoreModelsTestCase(TestCase):
         home_page = HomePage(
             title="Test Home",
             slug="test-home",
-            about_content="<p>Test about content</p>"
+            content=[]
         )
         root_page.add_child(instance=home_page)
         home_page.save_revision().publish()
         
         self.assertEqual(home_page.title, "Test Home")
         self.assertEqual(home_page.slug, "test-home")
-        self.assertEqual(home_page.about_content, "<p>Test about content</p>")
+        self.assertEqual(list(home_page.content), [])
         self.assertTrue(home_page.live)

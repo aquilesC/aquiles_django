@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.base
+!.env.*.example
+
+# Local data directories populated at runtime
+/.data/*/backups/*
+!/.data/*/backups/
+!/.data/*/backups/.gitkeep
+/.data/*/media/*
+!/.data/*/media/
+!/.data/*/media/.gitkeep
+/.data/*/static/*
+!/.data/*/static/
+!/.data/*/static/.gitkeep

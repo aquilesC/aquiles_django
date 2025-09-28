@@ -1,0 +1,26 @@
+services:
+  web:
+    env_file:
+      - ./env/.env.base
+      - ./env/.env.dev
+    environment:
+      RUN_CHECKS: "false"
+      COLLECT_STATIC: "false"
+      APP_COMMAND: "python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ../:/app:z
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - "8001:8000"
+
+  db:
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../.data/dev/backups:/backups
+    ports:
+      - "5432:5432"
+
+  nginx:
+    ports:
+      - "8000:80"
