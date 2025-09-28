@@ -7,7 +7,6 @@ from django.conf import settings
 from django.template import Context, Engine
 from django.template.loader import render_to_string
 from django.utils import timezone
-from django.utils.html import strip_tags
 
 from .models import (
     Campaign,
@@ -31,12 +30,10 @@ def _get_engine() -> Engine:
 
 def render_email_parts(template: EmailTemplate, context: dict) -> tuple[str, str, str]:
     engine = _get_engine()
-    subject = engine.from_string(template.subject_template).render(Context(context)).strip()
-    html_body = engine.from_string(template.html_body).render(Context(context))
-    if template.text_body:
-        text_body = engine.from_string(template.text_body).render(Context(context))
-    else:
-        text_body = strip_tags(html_body)
+    context_obj = Context(context)
+    subject = engine.from_string(template.subject_template).render(context_obj).strip()
+    html_body = engine.from_string(str(template.html_body)).render(context_obj)
+    text_body = template.render_plain_text(context)
     return subject, html_body, text_body
 
 

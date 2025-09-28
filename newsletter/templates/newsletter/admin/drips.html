@@ -1,0 +1,147 @@
+{% extends "newsletter/admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }} · Aquiles Newsletter{% endblock %}
+
+{% block extra_head %}
+<style>
+    .drip-grid {
+        display: grid;
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+
+    .drip-card {
+        padding: 1.5rem;
+        border-radius: 18px;
+        background: rgba(255,255,255,0.95);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        box-shadow: 0 18px 45px -28px rgba(15, 23, 42, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .drip-card header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .drip-card h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(99, 102, 241, 0.15);
+        color: #3730a3;
+    }
+
+    .badge-success {
+        background: rgba(22, 163, 74, 0.12);
+        color: #166534;
+    }
+
+    .badge-muted {
+        background: rgba(148, 163, 184, 0.18);
+        color: #334155;
+    }
+
+    .steps {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.45rem;
+        font-size: 0.9rem;
+    }
+
+    .steps li {
+        padding: 0.45rem 0.65rem;
+        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .steps small {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-section">
+    <div class="section-header">
+        <div>
+            <p class="muted">{% trans "Automate onboarding and nurture journeys with drip sequences." %}</p>
+        </div>
+        <div class="pill">
+            {% blocktrans %}{{ active_drip_count }} active · {{ archived_drip_count }} archived{% endblocktrans %}
+        </div>
+    </div>
+
+    {% if drips %}
+        <div class="drip-grid">
+            {% for drip in drips %}
+                <article class="drip-card">
+                    <header>
+                        <h3>{{ drip.name }}</h3>
+                        <span class="badge {% if drip.enabled and not drip.archived %}badge-success{% else %}badge-muted{% endif %}">
+                            {% if drip.archived %}{% trans "Archived" %}{% elif drip.enabled %}{% trans "Active" %}{% else %}{% trans "Paused" %}{% endif %}
+                        </span>
+                    </header>
+                    <div class="meta">
+                        <span>{% trans "List" %}: {{ drip.subscription_list.name }}</span>
+                        <span>•</span>
+                        <span>{% trans "Start" %}: {{ drip.get_start_strategy_display }}</span>
+                        {% if drip.start_delay_days %}
+                            <span>•</span>
+                            <span>{% trans "Delay" %}: {{ drip.start_delay_days }} {% trans "days" %}</span>
+                        {% endif %}
+                        <span>•</span>
+                        <span>{% trans "Send" %}: {{ drip.send_time|time:"H:i" }} {{ drip.timezone }}</span>
+                    </div>
+                    <p class="muted">{{ drip.description }}</p>
+                    <ul class="steps">
+                        {% for step in drip.steps.all %}
+                            <li>
+                                <span>#{{ step.order }} · {{ step.title }}</span>
+                                <small>
+                                    {% trans "Offset" %}: {{ step.offset_days }} {% trans "days" %}
+                                    {% if step.offset_weeks %}+ {{ step.offset_weeks }} {% trans "weeks" %}{% endif %}
+                                </small>
+                            </li>
+                        {% empty %}
+                            <li><span>{% trans "No steps yet." %}</span></li>
+                        {% endfor %}
+                    </ul>
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">{% trans "No drip campaigns found." %}</div>
+    {% endif %}
+</div>
+{% endblock %}
