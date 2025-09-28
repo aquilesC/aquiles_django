@@ -3,8 +3,9 @@ from __future__ import annotations
 from typing import Iterable, Optional
 
 from django import forms
+from django.utils.html import strip_tags
 
-from .models import SubscriptionList
+from .models import Campaign, DripCampaign, EmailTemplate, SubscriptionList
 
 
 class SubscriptionForm(forms.Form):
@@ -61,3 +62,55 @@ class UnsubscribeForm(forms.Form):
             "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500",
         )
         self.fields["confirm"].widget.attrs.setdefault("class", "h-4 w-4 text-red-600 border-gray-300 rounded")
+
+
+class EmailTemplateForm(forms.ModelForm):
+    class Meta:
+        model = EmailTemplate
+        fields = [
+            "name",
+            "subject_template",
+            "preview_text",
+            "html_body",
+            "text_body",
+            "archived",
+        ]
+        widgets = {
+            "html_body": forms.HiddenInput(),
+            "text_body": forms.Textarea(attrs={"rows": 6, "class": "w-input"}),
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        html_value = cleaned.get("html_body", "") or ""
+        text_value = cleaned.get("text_body", "")
+        if not text_value and html_value:
+            cleaned["text_body"] = strip_tags(html_value)
+        return cleaned
+
+
+class CampaignForm(forms.ModelForm):
+    auto_schedule = forms.BooleanField(required=False, widget=forms.HiddenInput())
+
+    class Meta:
+        model = Campaign
+        fields = [
+            "name",
+            "email_template",
+            "lists",
+            "send_at",
+            "send_timezone",
+            "notes",
+            "archived",
+        ]
+        widgets = {
+            "lists": forms.CheckboxSelectMultiple(),
+            "send_at": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "notes": forms.Textarea(attrs={"rows": 4}),
+        }
+
+
+class DripCampaignArchiveForm(forms.ModelForm):
+    class Meta:
+        model = DripCampaign
+        fields = ["archived"]

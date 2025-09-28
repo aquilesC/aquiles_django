@@ -171,14 +171,16 @@ class NewsletterDashboardView(TemplateView):
         context["pending_subscriptions"] = Subscription.objects.filter(status=Subscription.Status.PENDING).count()
         
         # Import Campaign and EmailMessageLog for analytics
-        from .models import Campaign, EmailMessageLog, EmailEvent
+        from .models import Campaign, DripCampaign, EmailMessageLog, EmailEvent
         
         # Campaign analytics
-        context["total_campaigns"] = Campaign.objects.count()
-        context["draft_campaigns"] = Campaign.objects.filter(status=Campaign.Status.DRAFT).count()
-        context["scheduled_campaigns"] = Campaign.objects.filter(status=Campaign.Status.SCHEDULED).count()
-        context["recent_campaigns"] = Campaign.objects.order_by('-created_at')[:5]
-        
+        active_campaigns = Campaign.objects.filter(archived=False)
+        context["total_campaigns"] = active_campaigns.count()
+        context["draft_campaigns"] = active_campaigns.filter(status=Campaign.Status.DRAFT).count()
+        context["scheduled_campaigns"] = active_campaigns.filter(status=Campaign.Status.SCHEDULED).count()
+        context["recent_campaigns"] = active_campaigns.order_by('-created_at')[:5]
+        context["upcoming_campaigns"] = active_campaigns.filter(status=Campaign.Status.SCHEDULED).order_by('send_at')[:5]
+
         # Email performance analytics
         context["total_emails_sent"] = EmailMessageLog.objects.filter(status=EmailMessageLog.Status.SENT).count()
         context["emails_delivered"] = EmailMessageLog.objects.filter(status=EmailMessageLog.Status.DELIVERED).count()
@@ -202,7 +204,19 @@ class NewsletterDashboardView(TemplateView):
         context["recent_emails"] = EmailMessageLog.objects.select_related(
             'subscriber', 'campaign', 'drip_step'
         ).order_by('-sent_at')[:10]
-        
+
+        context["drip_overview"] = [
+            {
+                "id": drip.pk,
+                "name": drip.name,
+                "enabled": drip.enabled,
+                "archived": drip.archived,
+                "list": drip.subscription_list.name,
+                "steps": list(drip.steps.order_by("order").values("order", "title", "offset_days", "offset_weeks")),
+            }
+            for drip in DripCampaign.objects.filter(archived=False).prefetch_related("steps", "subscription_list")
+        ]
+
         # Subscription growth (last 30 days)
         from datetime import timedelta
         thirty_days_ago = timezone.now() - timedelta(days=30)

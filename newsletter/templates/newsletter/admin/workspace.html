@@ -1,0 +1,753 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n wagtailadmin_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css">
+<style>
+    :root {
+        --workspace-bg: #f5f7fa;
+        --card-bg: #ffffff;
+        --card-border: #e1e6ef;
+        --accent: #4f46e5;
+        --accent-soft: rgba(79, 70, 229, 0.12);
+        --muted: #6b7280;
+    }
+
+    .workspace-root {
+        background: var(--workspace-bg);
+        min-height: calc(100vh - 120px);
+    }
+
+    .workspace-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .workspace-title {
+        font-size: 2rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .workspace-actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .workspace-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .workspace-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 1.75rem;
+        box-shadow: 0 12px 30px -24px rgba(15, 23, 42, 0.35);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .workspace-card header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .workspace-card h2 {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 600;
+    }
+
+    .workspace-card p.lead {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+    }
+
+    .field-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .field-grid.two {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .field label {
+        font-weight: 600;
+        color: #111827;
+        display: block;
+        margin-bottom: 0.35rem;
+    }
+
+    .field input[type="text"],
+    .field input[type="datetime-local"],
+    .field textarea,
+    .field select {
+        width: 100%;
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        padding: 0.65rem 0.75rem;
+        font-size: 0.95rem;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .field textarea {
+        min-height: 140px;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+        border-color: var(--accent);
+        outline: none;
+        box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .chip-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .chip {
+        background: var(--accent-soft);
+        color: var(--accent);
+        padding: 0.25rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .button-primary,
+    .button-secondary,
+    .button-muted {
+        border-radius: 999px;
+        padding: 0.55rem 1.15rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    .button-primary {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        box-shadow: 0 12px 20px -15px rgba(79, 70, 229, 0.6);
+    }
+
+    .button-secondary {
+        background: #eef2ff;
+        color: #3730a3;
+    }
+
+    .button-muted {
+        background: transparent;
+        color: var(--muted);
+        border: 1px solid var(--card-border);
+    }
+
+    .button-small {
+        padding: 0.35rem 0.8rem;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    .template-list,
+    .campaign-list,
+    .drip-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        max-height: 360px;
+        overflow-y: auto;
+    }
+
+    .list-item {
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 0.9rem 1rem;
+        border: 1px solid rgba(15, 23, 42, 0.04);
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .list-item .meta {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.4rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+    }
+
+    .status-pill {
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .status-pill.draft { background: #f3f4f6; color: #6b7280; }
+    .status-pill.scheduled { background: #dbeafe; color: #1d4ed8; }
+    .status-pill.sending { background: #fee2e2; color: #b91c1c; }
+    .status-pill.sent { background: #dcfce7; color: #15803d; }
+    .status-pill.cancelled { background: #f3f4f6; color: #6b7280; }
+
+    .scheduler-toggle {
+        display: inline-flex;
+        padding: 0.35rem;
+        background: #eef2ff;
+        border-radius: 999px;
+        gap: 0.35rem;
+    }
+
+    .scheduler-toggle button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.4rem 0.9rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: transparent;
+        color: #4338ca;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .scheduler-toggle button.is-active {
+        background: #4f46e5;
+        color: #fff;
+        box-shadow: 0 6px 12px -10px rgba(79, 70, 229, 0.9);
+    }
+
+    .schedule-fields {
+        border: 1px dashed rgba(79, 70, 229, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        display: grid;
+        gap: 0.75rem;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .quill-wrapper {
+        border-radius: 12px;
+        border: 1px solid #d1d5db;
+        overflow: hidden;
+    }
+
+    #template-editor {
+        height: 260px;
+        background: #fff;
+    }
+
+    .drip-visual {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .drip-campaign {
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        padding: 1.25rem;
+        background: #f8fafc;
+    }
+
+    .drip-campaign header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 1rem;
+    }
+
+    .timeline {
+        position: relative;
+        padding-left: 1.5rem;
+    }
+
+    .timeline::before {
+        content: "";
+        position: absolute;
+        left: 0.4rem;
+        top: 0.25rem;
+        bottom: 0.25rem;
+        width: 2px;
+        background: linear-gradient(180deg, #6366f1, transparent);
+    }
+
+    .timeline-step {
+        position: relative;
+        padding-left: 0.75rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .timeline-step::before {
+        content: "";
+        position: absolute;
+        left: -1.1rem;
+        top: 0.2rem;
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #4f46e5;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    }
+
+    .timeline-step strong {
+        display: block;
+        font-weight: 600;
+    }
+
+    .timeline-step small {
+        color: var(--muted);
+    }
+
+    @media (max-width: 960px) {
+        .workspace-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .workspace-actions {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="nice-padding workspace-root">
+    <div class="workspace-header">
+        <div>
+            <h1 class="workspace-title">{% trans "Newsletter workspace" %}</h1>
+            <p class="lead">{% trans "Compose, schedule and visualise every part of your email program in one place." %}</p>
+        </div>
+        <div class="workspace-actions">
+            <a href="{% url 'newsletter_dashboard' %}" class="button button-secondary">{% trans "View analytics" %}</a>
+        </div>
+    </div>
+
+    <div class="workspace-grid">
+        <form method="post" class="workspace-card" id="template-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_template">
+            <input type="hidden" name="template_id" id="id_template_id">
+            <header>
+                <div>
+                    <h2>{% trans "Email template" %}</h2>
+                    <p class="lead">{% trans "Design stunning content with live plain-text conversion." %}</p>
+                </div>
+                <button type="submit" class="button-primary">
+                    {% icon name="tick" %}
+                    <span>{% trans "Save template" %}</span>
+                </button>
+            </header>
+            {{ template_form.non_field_errors }}
+            <div class="field-grid">
+                <div class="field">
+                    <label for="id_template-name">{% trans "Template name" %}</label>
+                    {{ template_form.name }}
+                </div>
+                <div class="field">
+                    <label for="id_template-subject_template">{% trans "Subject" %}</label>
+                    {{ template_form.subject_template }}
+                </div>
+                <div class="field">
+                    <label for="id_template-preview_text">{% trans "Preview text" %}</label>
+                    {{ template_form.preview_text }}
+                </div>
+                <div class="field">
+                    <label>{% trans "HTML content" %}</label>
+                    <div class="quill-wrapper">
+                        <div id="template-editor"></div>
+                    </div>
+                    {{ template_form.html_body }}
+                </div>
+                <div class="field">
+                    <label for="id_template-text_body">{% trans "Plain text" %}</label>
+                    <div style="display:flex; justify-content: flex-end; margin-bottom:0.5rem;">
+                        <button type="button" class="button-secondary button-small" id="convert-to-text">
+                            {% icon name="doc-empty-inverse" %}
+                            <span>{% trans "Convert from HTML" %}</span>
+                        </button>
+                    </div>
+                    {{ template_form.text_body }}
+                </div>
+                <div class="field" style="display:flex; align-items:center; gap:0.5rem;">
+                    {{ template_form.archived }}
+                    <label for="id_template-archived" style="margin:0;">{% trans "Archive template" %}</label>
+                </div>
+            </div>
+        </form>
+
+        <form method="post" class="workspace-card" id="campaign-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_campaign">
+            <input type="hidden" name="campaign_id" id="id_campaign_id">
+            {{ campaign_form.auto_schedule }}
+            <header>
+                <div>
+                    <h2>{% trans "Campaign scheduler" %}</h2>
+                    <p class="lead">{% trans "Plan a one-off send or trigger a hands-off delivery." %}</p>
+                </div>
+                <button type="submit" class="button-primary">
+                    {% icon name="mail" %}
+                    <span>{% trans "Save campaign" %}</span>
+                </button>
+            </header>
+            {{ campaign_form.non_field_errors }}
+            <div class="field-grid">
+                <div class="field">
+                    <label for="id_campaign-name">{% trans "Campaign name" %}</label>
+                    {{ campaign_form.name }}
+                </div>
+                <div class="field">
+                    <label for="id_campaign-email_template">{% trans "Email template" %}</label>
+                    {{ campaign_form.email_template }}
+                </div>
+                <div class="field">
+                    <label>{% trans "Subscription lists" %}</label>
+                    <div class="chip-list" id="campaign-lists">
+                        {% for widget in campaign_form.lists %}
+                            <label class="chip" style="cursor:pointer;">
+                                {{ widget.tag }} {{ widget.choice_label }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="field">
+                    <label>{% trans "Schedule" %}</label>
+                    <div class="scheduler-toggle" id="scheduler-toggle">
+                        <button type="button" data-mode="now" class="is-active">{% trans "Send now" %}</button>
+                        <button type="button" data-mode="later">{% trans "Schedule" %}</button>
+                    </div>
+                </div>
+                <div class="schedule-fields" id="schedule-fields" hidden>
+                    <div class="field">
+                        <label for="id_campaign-send_at">{% trans "Send at" %}</label>
+                        {{ campaign_form.send_at }}
+                    </div>
+                    <div class="field">
+                        <label for="id_campaign-send_timezone">{% trans "Timezone" %}</label>
+                        {{ campaign_form.send_timezone }}
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="id_campaign-notes">{% trans "Notes" %}</label>
+                    {{ campaign_form.notes }}
+                </div>
+                <div class="field" style="display:flex; align-items:center; gap:0.5rem;">
+                    {{ campaign_form.archived }}
+                    <label for="id_campaign-archived" style="margin:0;">{% trans "Archive campaign" %}</label>
+                </div>
+            </div>
+        </form>
+
+        <div class="workspace-card">
+            <header>
+                <div>
+                    <h2>{% trans "Template library" %}</h2>
+                    <p class="lead">{% trans "Quickly switch between active and archived designs." %}</p>
+                </div>
+            </header>
+            <div class="template-list">
+                {% for template in templates %}
+                <div class="list-item" data-template-item="{{ template.pk }}">
+                    <strong>{{ template.name }}</strong>
+                    <div class="meta">
+                        <span>{% trans "Updated" %}: {{ template.updated_at|date:"M d, Y" }}</span>
+                        <span>{% trans "Status" %}: {{ template.archived|yesno:_("Archived,Active") }}</span>
+                    </div>
+                    <div class="workspace-actions" style="justify-content:flex-start;">
+                        <button type="button" class="button-secondary button-small js-load-template" data-template-id="{{ template.pk }}">
+                            {% icon name="edit" %}
+                            <span>{% trans "Edit" %}</span>
+                        </button>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="template_id" value="{{ template.pk }}">
+                            <input type="hidden" name="action" value="{% if template.archived %}restore_template{% else %}archive_template{% endif %}">
+                            <button type="submit" class="button-muted button-small">
+                                {% if template.archived %}{% trans "Restore" %}{% else %}{% trans "Archive" %}{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="lead">{% trans "Create your first template to get started." %}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="workspace-card">
+            <header>
+                <div>
+                    <h2>{% trans "Campaign timeline" %}</h2>
+                    <p class="lead">{% trans "Manage schedules, send status and archives." %}</p>
+                </div>
+            </header>
+            <div class="campaign-list">
+                {% for campaign in campaigns %}
+                <div class="list-item" data-campaign-item="{{ campaign.pk }}">
+                    <strong>{{ campaign.name }}</strong>
+                    <div class="meta">
+                        <span>{% trans "Template" %}: {{ campaign.email_template.name }}</span>
+                        <span class="status-pill {{ campaign.status }}">{{ campaign.get_status_display }}</span>
+                    </div>
+                    <small>{% trans "Lists" %}: {% for lst in campaign.lists.all %}<span class="chip">{{ lst.name }}</span>{% empty %}{% trans "None" %}{% endfor %}</small>
+                    {% if campaign.send_at %}
+                        <small>{% trans "Scheduled" %}: {{ campaign.send_at|date:"M d, Y H:i" }}</small>
+                    {% endif %}
+                    <div class="workspace-actions" style="justify-content:flex-start;">
+                        <button type="button" class="button-secondary button-small js-load-campaign" data-campaign-id="{{ campaign.pk }}">
+                            {% icon name="edit" %}
+                            <span>{% trans "Edit" %}</span>
+                        </button>
+                        <form method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="campaign_id" value="{{ campaign.pk }}">
+                            <input type="hidden" name="action" value="{% if campaign.archived %}restore_campaign{% else %}archive_campaign{% endif %}">
+                            <button type="submit" class="button-muted button-small">
+                                {% if campaign.archived %}{% trans "Restore" %}{% else %}{% trans "Archive" %}{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="lead">{% trans "Create a campaign to start scheduling sends." %}</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="workspace-card" style="grid-column: 1 / -1;">
+            <header>
+                <div>
+                    <h2>{% trans "Drip campaign visualiser" %}</h2>
+                    <p class="lead">{% trans "Understand how subscribers progress through each sequence." %}</p>
+                </div>
+            </header>
+            <div class="drip-visual">
+                {% for drip in drip_campaigns %}
+                <div class="drip-campaign">
+                    <header>
+                        <div>
+                            <strong>{{ drip.name }}</strong>
+                            <div class="meta">
+                                <span>{% trans "List" %}: {{ drip.subscription_list.name }}</span>
+                                <span>{% trans "Status" %}: {{ drip.enabled|yesno:_("Enabled,Disabled") }}</span>
+                                <span>{% trans "Archive" %}: {{ drip.archived|yesno:_("Archived,Active") }}</span>
+                            </div>
+                        </div>
+                        <form method="post" style="margin:0;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="{% if drip.archived %}restore_drip{% else %}archive_drip{% endif %}">
+                            <input type="hidden" name="drip_id" value="{{ drip.pk }}">
+                            <input type="hidden" name="archived" value="{% if drip.archived %}0{% else %}1{% endif %}">
+                            <button type="submit" class="button-muted button-small">
+                                {% if drip.archived %}{% trans "Restore" %}{% else %}{% trans "Archive" %}{% endif %}
+                            </button>
+                        </form>
+                    </header>
+                    <div class="timeline">
+                        {% for step in drip.steps.all %}
+                        <div class="timeline-step">
+                            <strong>{{ step.order }}. {{ step.title }}</strong>
+                            <small>
+                                {% blocktrans with days=step.offset_days weeks=step.offset_weeks %}After {{ weeks }} weeks and {{ days }} days{% endblocktrans %}
+                                {% if step.send_weekday is not None %}
+                                    · {{ step.get_send_weekday_display }}
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% empty %}
+                        <p class="lead">{% trans "Add steps to this drip campaign from the Drip steps admin." %}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="lead">{% trans "No drip campaigns yet." %}</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ template_payload|json_script:"template-payload" }}
+{{ campaign_payload|json_script:"campaign-payload" }}
+{{ drip_payload|json_script:"drip-payload" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+<script>
+(function() {
+    const templateEl = document.getElementById('template-payload');
+    const campaignEl = document.getElementById('campaign-payload');
+    const templateData = templateEl ? JSON.parse(templateEl.textContent) : [];
+    const campaignData = campaignEl ? JSON.parse(campaignEl.textContent) : [];
+
+    const templateForm = document.getElementById('template-form');
+    if (templateForm) {
+        const htmlField = templateForm.querySelector('input[name="template-html_body"]');
+        const textField = templateForm.querySelector('textarea[name="template-text_body"]');
+        const templateIdField = document.getElementById('id_template_id');
+
+        const quill = new Quill('#template-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ header: [2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ list: 'ordered'}, { list: 'bullet' }],
+                    ['link', 'clean']
+                ]
+            }
+        });
+
+        if (htmlField && htmlField.value) {
+            quill.root.innerHTML = htmlField.value;
+        }
+
+        function htmlToText(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return div.innerText.replace(/\s+$/g, '').trim();
+        }
+
+        const convertBtn = document.getElementById('convert-to-text');
+        if (convertBtn && textField) {
+            convertBtn.addEventListener('click', function() {
+                textField.value = htmlToText(quill.root.innerHTML);
+            });
+        }
+
+        templateForm.addEventListener('submit', function() {
+            if (htmlField) {
+                htmlField.value = quill.root.innerHTML;
+            }
+        });
+
+        document.querySelectorAll('.js-load-template').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const template = templateData.find(item => item.id === Number(button.dataset.templateId));
+                if (!template) return;
+                if (templateIdField) templateIdField.value = template.id;
+                const nameField = templateForm.querySelector('input[name="template-name"]');
+                if (nameField) nameField.value = template.name;
+                const subjectField = templateForm.querySelector('input[name="template-subject_template"]');
+                if (subjectField) subjectField.value = template.subject_template;
+                const previewField = templateForm.querySelector('input[name="template-preview_text"]');
+                if (previewField) previewField.value = template.preview_text || '';
+                quill.root.innerHTML = template.html_body || '';
+                if (htmlField) htmlField.value = template.html_body || '';
+                if (textField) textField.value = template.text_body || '';
+                const archivedField = templateForm.querySelector('input[name="template-archived"]');
+                if (archivedField) {
+                    archivedField.checked = Boolean(template.archived);
+                }
+                templateForm.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    }
+
+    const campaignForm = document.getElementById('campaign-form');
+    if (campaignForm) {
+        const campaignIdField = document.getElementById('id_campaign_id');
+        const autoScheduleField = campaignForm.querySelector('input[name="campaign-auto_schedule"]');
+        const scheduleFields = document.getElementById('schedule-fields');
+        const schedulerToggle = document.getElementById('scheduler-toggle');
+
+        if (schedulerToggle) {
+            schedulerToggle.addEventListener('click', function(event) {
+                const button = event.target.closest('button[data-mode]');
+                if (!button) return;
+                schedulerToggle.querySelectorAll('button').forEach(btn => btn.classList.remove('is-active'));
+                button.classList.add('is-active');
+                const mode = button.dataset.mode;
+                if (mode === 'later') {
+                    if (scheduleFields) scheduleFields.hidden = false;
+                    if (autoScheduleField) autoScheduleField.value = '1';
+                } else {
+                    if (scheduleFields) scheduleFields.hidden = true;
+                    if (autoScheduleField) autoScheduleField.value = '';
+                    const sendAtField = campaignForm.querySelector('input[name="campaign-send_at"]');
+                    if (sendAtField) {
+                        sendAtField.value = '';
+                    }
+                }
+            });
+        }
+
+        document.querySelectorAll('.js-load-campaign').forEach(function(button) {
+            button.addEventListener('click', function() {
+                const campaign = campaignData.find(item => item.id === Number(button.dataset.campaignId));
+                if (!campaign) return;
+                if (campaignIdField) campaignIdField.value = campaign.id;
+                const nameField = campaignForm.querySelector('input[name="campaign-name"]');
+                if (nameField) nameField.value = campaign.name || '';
+                const templateSelect = campaignForm.querySelector('select[name="campaign-email_template"]');
+                if (templateSelect) {
+                    templateSelect.value = campaign.email_template || '';
+                }
+                const listCheckboxes = campaignForm.querySelectorAll('input[name="campaign-lists"]');
+                listCheckboxes.forEach(cb => {
+                    cb.checked = campaign.lists.includes(Number(cb.value));
+                });
+                const sendAtField = campaignForm.querySelector('input[name="campaign-send_at"]');
+                if (sendAtField) {
+                    if (campaign.send_at) {
+                        const dt = new Date(campaign.send_at);
+                        const local = new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0,16);
+                        sendAtField.value = local;
+                        if (scheduleFields) scheduleFields.hidden = false;
+                        if (autoScheduleField) autoScheduleField.value = '1';
+                        if (schedulerToggle) {
+                            schedulerToggle.querySelectorAll('button').forEach(btn => btn.classList.remove('is-active'));
+                            const laterBtn = schedulerToggle.querySelector('button[data-mode="later"]');
+                            if (laterBtn) laterBtn.classList.add('is-active');
+                        }
+                    } else {
+                        sendAtField.value = '';
+                        if (scheduleFields) scheduleFields.hidden = true;
+                        if (autoScheduleField) autoScheduleField.value = '';
+                        if (schedulerToggle) {
+                            schedulerToggle.querySelectorAll('button').forEach(btn => btn.classList.remove('is-active'));
+                            const nowBtn = schedulerToggle.querySelector('button[data-mode="now"]');
+                            if (nowBtn) nowBtn.classList.add('is-active');
+                        }
+                    }
+                }
+                const tzField = campaignForm.querySelector('input[name="campaign-send_timezone"], select[name="campaign-send_timezone"]');
+                if (tzField) {
+                    tzField.value = campaign.send_timezone || '';
+                }
+                const notesField = campaignForm.querySelector('textarea[name="campaign-notes"]');
+                if (notesField) {
+                    notesField.value = campaign.notes || '';
+                }
+                const archivedField = campaignForm.querySelector('input[name="campaign-archived"]');
+                if (archivedField) {
+                    archivedField.checked = Boolean(campaign.archived);
+                }
+                campaignForm.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    }
+})();
+</script>
+{% endblock %}

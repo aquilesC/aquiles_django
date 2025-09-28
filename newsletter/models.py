@@ -34,6 +34,7 @@ class EmailTemplate(TimeStampedModel):
         help_text=_("Supports Django template syntax."),
     )
     text_body = models.TextField(blank=True, help_text=_("Optional plain text version. Leave blank to auto-generate."))
+    archived = models.BooleanField(default=False)
 
     panels = [
         FieldPanel("name"),
@@ -43,6 +44,7 @@ class EmailTemplate(TimeStampedModel):
         ),
         FieldPanel("html_body"),
         FieldPanel("text_body"),
+        FieldPanel("archived"),
     ]
 
     class Meta:
@@ -217,6 +219,7 @@ class Campaign(TimeStampedModel):
     )
     scheduled_task_id = models.CharField(max_length=255, blank=True)
     notes = models.TextField(blank=True)
+    archived = models.BooleanField(default=False)
 
     panels = [
         FieldPanel("name"),
@@ -226,6 +229,7 @@ class Campaign(TimeStampedModel):
         FieldPanel("send_at"),
         FieldPanel("send_timezone"),
         FieldPanel("notes"),
+        FieldPanel("archived"),
     ]
 
     class Meta:
@@ -276,6 +280,7 @@ class DripCampaign(TimeStampedModel):
     send_time = models.TimeField(default=time(9, 0))
     timezone = models.CharField(max_length=64, default="UTC")
     description = models.TextField(blank=True)
+    archived = models.BooleanField(default=False)
 
     panels = [
         FieldPanel("name"),
@@ -286,6 +291,7 @@ class DripCampaign(TimeStampedModel):
         FieldPanel("send_time"),
         FieldPanel("timezone"),
         FieldPanel("description"),
+        FieldPanel("archived"),
     ]
 
     class Meta:
