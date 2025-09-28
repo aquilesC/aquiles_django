@@ -1,0 +1,266 @@
+{% extends "newsletter/admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ page_title }} · Aquiles Newsletter{% endblock %}
+
+{% block extra_head %}
+<style>
+    .split-grid {
+        display: grid;
+        gap: 2rem;
+        grid-template-columns: minmax(280px, 360px) 1fr;
+    }
+
+    @media (max-width: 980px) {
+        .split-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .panel {
+        border-radius: 18px;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        padding: 1.5rem;
+        background: rgba(255,255,255,0.95);
+        box-shadow: 0 18px 40px -25px rgba(15, 23, 42, 0.2);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .panel header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .panel header h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0f172a;
+    }
+
+    .status-chip {
+        display: inline-flex;
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(99, 102, 241, 0.1);
+        color: #3730a3;
+    }
+
+    .campaign-table tbody tr td:last-child {
+        width: 160px;
+    }
+
+    .table-actions {
+        display: inline-flex;
+        gap: 0.4rem;
+    }
+
+    .table-actions form {
+        display: inline;
+    }
+
+    .button-small {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .pagination {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.6rem;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+
+    .pagination a {
+        text-decoration: none;
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .help-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+    }
+
+    .tag {
+        padding: 0.2rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.06);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-section">
+    <div class="section-header">
+        <div>
+            <p class="muted">{% trans "Manage campaigns, review status and schedule upcoming sends." %}</p>
+        </div>
+        <div class="pill">
+            {% trans "Status" %} ·
+            {% for item in status_summary %}
+                {{ item.label }}: {{ item.count }}{% if not forloop.last %} · {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="split-grid">
+        <section class="panel">
+            <header>
+                <h2>
+                    {% if current_campaign %}
+                        {% trans "Edit campaign" %}
+                    {% else %}
+                        {% trans "Create campaign" %}
+                    {% endif %}
+                </h2>
+                {% if current_campaign %}
+                    <span class="status-chip">ID {{ current_campaign.pk }}</span>
+                {% endif %}
+            </header>
+            <form method="post" class="form-grid">
+                {% csrf_token %}
+                {{ campaign_form.non_field_errors }}
+                {{ campaign_form.auto_schedule }}
+                {% if current_campaign %}
+                    <input type="hidden" name="campaign_id" value="{{ current_campaign.pk }}">
+                {% endif %}
+                <div class="form-field">
+                    <label for="{{ campaign_form.name.id_for_label }}">{% trans "Name" %}</label>
+                    {{ campaign_form.name.as_widget(attrs={'class': 'input', 'placeholder': _('Product launch update')}) }}
+                    {{ campaign_form.name.errors }}
+                </div>
+                <div class="form-field">
+                    <label for="{{ campaign_form.email_template.id_for_label }}">{% trans "Email template" %}</label>
+                    {{ campaign_form.email_template.as_widget(attrs={'class': 'input'}) }}
+                    {{ campaign_form.email_template.errors }}
+                </div>
+                <div class="form-field">
+                    <label>{% trans "Subscription lists" %}</label>
+                    {{ campaign_form.lists }}
+                    {{ campaign_form.lists.errors }}
+                    <p class="help-text">{% trans "Choose at least one list to deliver this campaign." %}</p>
+                </div>
+                <div class="form-grid two-column">
+                    <div class="form-field">
+                        <label for="{{ campaign_form.send_at.id_for_label }}">{% trans "Send at" %}</label>
+                        {{ campaign_form.send_at.as_widget(attrs={'class': 'input'}) }}
+                        {{ campaign_form.send_at.errors }}
+                    </div>
+                    <div class="form-field">
+                        <label for="{{ campaign_form.send_timezone.id_for_label }}">{% trans "Timezone" %}</label>
+                        {{ campaign_form.send_timezone.as_widget(attrs={'class': 'input', 'placeholder': 'UTC'}) }}
+                        {{ campaign_form.send_timezone.errors }}
+                    </div>
+                </div>
+                <div class="form-field">
+                    <label for="{{ campaign_form.notes.id_for_label }}">{% trans "Notes" %}</label>
+                    {{ campaign_form.notes.as_widget(attrs={'class': 'input', 'rows': 4}) }}
+                    {{ campaign_form.notes.errors }}
+                </div>
+                <div class="form-field" style="display: none;">
+                    {{ campaign_form.archived }}
+                </div>
+                <div style="display:flex; gap:0.75rem;">
+                    <button type="submit" class="button button-primary">
+                        {% if current_campaign %}{% trans "Update campaign" %}{% else %}{% trans "Create campaign" %}{% endif %}
+                    </button>
+                    {% if current_campaign %}
+                        <a href="{{ request.path }}" class="button button-muted">{% trans "Clear" %}</a>
+                    {% endif %}
+                </div>
+            </form>
+        </section>
+
+        <section class="panel">
+            <header>
+                <h2>{% trans "All campaigns" %}</h2>
+                <span class="muted">{% blocktrans %}{{ campaigns_page.paginator.count }} total{% endblocktrans %}</span>
+            </header>
+            {% if campaigns_page %}
+                <table class="campaign-table">
+                    <thead>
+                        <tr>
+                            <th>{% trans "Name" %}</th>
+                            <th>{% trans "Lists" %}</th>
+                            <th>{% trans "Status" %}</th>
+                            <th>{% trans "Scheduled" %}</th>
+                            <th>{% trans "Actions" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for campaign in campaigns_page %}
+                            <tr>
+                                <td>
+                                    <strong>{{ campaign.name }}</strong><br>
+                                    <small class="muted">{% trans "Template" %}: {{ campaign.email_template.name }}</small>
+                                </td>
+                                <td>
+                                    <div class="tags">
+                                        {% for lst in campaign.lists.all %}
+                                            <span class="tag">{{ lst.name }}</span>
+                                        {% empty %}
+                                            <span class="muted">{% trans "No lists" %}</span>
+                                        {% endfor %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {{ campaign.get_status_display }}
+                                    {% if campaign.archived %}<br><small class="muted">{% trans "Archived" %}</small>{% endif %}
+                                </td>
+                                <td>
+                                    {% if campaign.send_at %}
+                                        {{ campaign.send_at|date:"M d, Y H:i" }}{% if campaign.send_timezone %} {{ campaign.send_timezone }}{% endif %}
+                                    {% else %}
+                                        <span class="muted">{% trans "Send immediately" %}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="table-actions">
+                                        <a class="button button-secondary button-small" href="?campaign={{ campaign.pk }}">{% trans "Edit" %}</a>
+                                        <form method="post" action="{{ request.path }}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="campaign_id" value="{{ campaign.pk }}">
+                                            {% if campaign.archived %}
+                                                <button class="button button-muted button-small" name="action" value="restore">{% trans "Restore" %}</button>
+                                            {% else %}
+                                                <button class="button button-muted button-small" name="action" value="archive">{% trans "Archive" %}</button>
+                                            {% endif %}
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    {% if campaigns_page.has_previous %}
+                        <a href="?page={{ campaigns_page.previous_page_number }}">{% trans "Previous" %}</a>
+                    {% endif %}
+                    <span class="muted">{% blocktrans %}Page {{ campaigns_page.number }} of {{ campaigns_page.paginator.num_pages }}{% endblocktrans %}</span>
+                    {% if campaigns_page.has_next %}
+                        <a href="?page={{ campaigns_page.next_page_number }}">{% trans "Next" %}</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="empty-state">{% trans "No campaigns yet. Create your first campaign using the form." %}</div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+{% endblock %}

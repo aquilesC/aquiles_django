@@ -8,8 +8,10 @@ from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.template import Context, Engine
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.fields import RichTextField
@@ -54,6 +56,20 @@ class EmailTemplate(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.name
+
+    def render_plain_text(self, context: Optional[dict] = None) -> str:
+        """Render a plain-text version of the template for sending."""
+
+        engine = Engine.get_default()
+        ctx = Context(context or {})
+
+        if self.text_body:
+            template = engine.from_string(self.text_body)
+            return template.render(ctx).strip()
+
+        html_template = engine.from_string(str(self.html_body))
+        rendered_html = html_template.render(ctx)
+        return strip_tags(rendered_html).strip()
 
 
 @register_snippet
@@ -239,6 +255,14 @@ class Campaign(TimeStampedModel):
 
     def __str__(self) -> str:
         return self.name
+
+    def render_plain_text(self, context: Optional[dict] = None) -> str:
+        """Render the campaign's content to plain text."""
+
+        base_context = {"campaign": self}
+        if context:
+            base_context.update(context)
+        return self.email_template.render_plain_text(base_context)
 
     def get_from_email(self) -> str:
         custom = next(
