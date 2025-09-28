@@ -10,6 +10,26 @@
         gap: 1rem;
         margin-bottom: 2rem;
     }
+    .dashboard-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .dashboard-actions a.button-primary {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #fff;
+        padding: 0.6rem 1.2rem;
+        border-radius: 999px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        box-shadow: 0 12px 24px -18px rgba(79, 70, 229, 0.7);
+    }
     .stat-card {
         background: white;
         border: 1px solid #e1e5e9;
@@ -35,6 +55,28 @@
         border-radius: 8px;
         padding: 1.5rem;
         margin-bottom: 1rem;
+    }
+    .timeline-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+    }
+    .timeline-list li {
+        position: relative;
+        padding-left: 1.5rem;
+        margin-bottom: 1rem;
+        border-left: 2px solid rgba(79, 70, 229, 0.2);
+    }
+    .timeline-list li::before {
+        content: "";
+        position: absolute;
+        left: -6px;
+        top: 8px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #4f46e5;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
     }
     .recent-activity {
         max-height: 400px;
@@ -62,12 +104,39 @@
     .status-sending { background: #e74c3c; color: white; }
     .status-sent { background: #27ae60; color: white; }
     .status-cancelled { background: #95a5a6; color: white; }
+    .drip-overview {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    }
+    .drip-card {
+        border: 1px solid #eef0f4;
+        border-radius: 8px;
+        padding: 1rem;
+        background: #f9fafb;
+    }
+    .drip-card h4 {
+        margin: 0 0 0.5rem 0;
+    }
+    .drip-card ul {
+        margin: 0;
+        padding-left: 1.1rem;
+        color: #4b5563;
+    }
+    .drip-card li {
+        margin-bottom: 0.35rem;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="nice-padding">
-    <h1 class="wagtail-admin-title">{% trans "Newsletter Dashboard" %}</h1>
+    <div class="dashboard-actions">
+        <h1 class="wagtail-admin-title" style="margin: 0;">{% trans "Newsletter Dashboard" %}</h1>
+        <a href="{% url 'newsletter_workspace' %}" class="button-primary">
+            {% trans "Open modern workspace" %}
+        </a>
+    </div>
     
     <!-- Stats Grid -->
     <div class="stats-grid">
@@ -132,6 +201,21 @@
 
         <!-- Right Column -->
         <div>
+            <div class="chart-container">
+                <h3>{% trans "Upcoming sends" %}</h3>
+                {% if upcoming_campaigns %}
+                <ul class="timeline-list">
+                    {% for campaign in upcoming_campaigns %}
+                    <li>
+                        <strong>{{ campaign.name }}</strong><br>
+                        <small class="text-muted">{{ campaign.send_at|date:"M d, Y H:i" }} · {{ campaign.email_template.name }}</small>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">{% trans "No scheduled sends." %}</p>
+                {% endif %}
+            </div>
             <!-- Subscription Lists -->
             <div class="chart-container">
                 <h3>{% trans "Subscription Lists" %}</h3>
@@ -176,6 +260,37 @@
                 {% endif %}
             </div>
         </div>
+    </div>
+
+    <div class="chart-container">
+        <h3>{% trans "Drip sequences" %}</h3>
+        {% if drip_overview %}
+        <div class="drip-overview">
+            {% for drip in drip_overview %}
+            <div class="drip-card">
+                <h4>{{ drip.name }}</h4>
+                <p class="text-muted" style="margin-bottom: 0.5rem;">{{ drip.list }} · {% if drip.enabled %}{% trans "Enabled" %}{% else %}{% trans "Disabled" %}{% endif %}</p>
+                {% if drip.steps %}
+                <ul>
+                    {% for step in drip.steps %}
+                    <li>
+                        <strong>{{ step.order }}.</strong>
+                        {{ step.title }}
+                        <span class="text-muted">
+                            ({{ step.offset_weeks }}w {{ step.offset_days }}d)
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">{% trans "No steps configured." %}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">{% trans "No drip campaigns defined yet." %}</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -34,7 +34,7 @@ class EmailTemplateViewSet(ModelViewSet):
     menu_order = 210
     list_display = ("name", "subject_template", "updated_at")
     search_fields = ("name", "subject_template")
-    form_fields = ["name", "subject_template", "preview_text", "html_body", "text_body"]
+    form_fields = ["name", "subject_template", "preview_text", "html_body", "text_body", "archived"]
 
 
 class SubscriberViewSet(ModelViewSet):
@@ -66,7 +66,7 @@ class CampaignViewSet(ModelViewSet):
     list_display = ("name", "status", "send_at", "sent_at", "email_template")
     list_filter = ("status", "email_template", "lists")
     search_fields = ("name", "notes")
-    form_fields = ["name", "email_template", "lists", "status", "send_at", "send_timezone", "notes"]
+    form_fields = ["name", "email_template", "lists", "status", "send_at", "send_timezone", "notes", "archived"]
     
     def get_queryset(self, request=None):
         return super().get_queryset(request).select_related("email_template").prefetch_related("lists")
@@ -80,7 +80,17 @@ class DripCampaignViewSet(ModelViewSet):
     list_display = ("name", "subscription_list", "enabled")
     list_filter = ("enabled", "subscription_list")
     search_fields = ("name",)
-    form_fields = ["name", "subscription_list", "enabled", "start_strategy", "start_delay_days", "send_time", "timezone", "description"]
+    form_fields = [
+        "name",
+        "subscription_list",
+        "enabled",
+        "start_strategy",
+        "start_delay_days",
+        "send_time",
+        "timezone",
+        "description",
+        "archived",
+    ]
 
 
 class DripStepViewSet(ModelViewSet):
@@ -140,10 +150,16 @@ def register_drip_step_viewset():
 
 @hooks.register("register_admin_urls")
 def register_newsletter_admin_urls():
-    from .admin_views import CampaignActionView, TemplatePreviewView, SubscriberImportView
-    
+    from .admin_views import (
+        CampaignActionView,
+        NewsletterWorkspaceView,
+        SubscriberImportView,
+        TemplatePreviewView,
+    )
+
     return [
         path("newsletter/dashboard/", NewsletterDashboardView.as_view(), name="newsletter_dashboard"),
+        path("newsletter/workspace/", NewsletterWorkspaceView.as_view(), name="newsletter_workspace"),
         path("newsletter/campaigns/<int:campaign_id>/<str:action>/", CampaignActionView.as_view(), name="campaign_action"),
         path("newsletter/templates/<int:template_id>/preview/", TemplatePreviewView.as_view(), name="template_preview"),
         path("newsletter/subscribers/import/", SubscriberImportView.as_view(), name="subscriber_import"),
@@ -158,3 +174,8 @@ def register_newsletter_menu_item():
 @hooks.register("register_admin_menu_item")
 def register_subscriber_import_menu_item():
     return MenuItem("Import subscribers", reverse("subscriber_import"), icon_name="download", order=280)
+
+
+@hooks.register("register_admin_menu_item")
+def register_newsletter_workspace_menu_item():
+    return MenuItem("Newsletter workspace", reverse("newsletter_workspace"), icon_name="edit", order=265)
