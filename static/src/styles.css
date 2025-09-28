@@ -351,23 +351,29 @@ a:focus {
 /* Mobile menu animations */
 #mobile-menu {
     transition: all 0.3s ease-in-out;
-}
-
-#mobile-menu.hidden {
-    opacity: 0;
     transform: translateY(-10px);
+    opacity: 0;
     pointer-events: none;
 }
 
 #mobile-menu:not(.hidden) {
-    opacity: 1;
     transform: translateY(0);
+    opacity: 1;
     pointer-events: auto;
 }
 
 /* Mobile menu button animations */
 #menu-icon, #close-icon {
     transition: all 0.2s ease-in-out;
+}
+
+/* Ensure proper icon switching */
+#menu-icon.hidden {
+    display: none;
+}
+
+#close-icon.hidden {
+    display: none;
 }
 
 /* Smooth transitions */
