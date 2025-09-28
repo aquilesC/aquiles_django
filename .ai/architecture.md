@@ -20,6 +20,7 @@
 - **npm** - Package management for frontend dependencies
 - **pip** - Python package management
 - **Git** - Version control
+- **Virtual Environment** - Located in `.venv/` directory
 
 ### Deployment
 - **DigitalOcean** - Cloud hosting platform

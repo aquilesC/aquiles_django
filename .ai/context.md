@@ -31,6 +31,11 @@ When working with AI tools:
 - PostgreSQL (production) / SQLite (development)
 - DigitalOcean deployment
 
+**Development Environment:**
+- Virtual environment: `.venv/` directory
+- Python 3.11+ with pip
+- Node.js with npm for frontend dependencies
+
 **Primary Goals:**
 - Scalable content management system
 - Member authentication and gated content

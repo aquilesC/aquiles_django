@@ -49,8 +49,8 @@ git push origin feature/new-blog-system
 ### Local Development Setup
 1. **Environment Setup**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
+   python -m venv .venv
+   source .venv/bin/activate  # Linux/Mac
    pip install -r requirements.txt
    ```
 
@@ -103,7 +103,7 @@ git push origin feature/new-blog-system
 ```bash
 # Start of day
 git pull origin main
-source venv/bin/activate
+source .venv/bin/activate
 npm run watch:css &
 python manage.py runserver
 
