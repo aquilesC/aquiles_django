@@ -1,44 +1,68 @@
 {% load wagtailimages_tags %}
 
-<section class="relative overflow-hidden {% if value.background_color %}bg-[{{ value.background_color }}]{% else %}bg-gradient-to-r from-slate-50 to-slate-100{% endif %}">
+<!-- Hero Section - Design Brief Structure -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
     {% if value.background_image %}
         <div class="absolute inset-0">
-            {% image value.background_image fill-1920x800 as bg_image %}
+            {% image value.background_image fill-1920x1080 as bg_image %}
             <img src="{{ bg_image.url }}" alt="" class="h-full w-full object-cover" />
-            <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+            <div class="absolute inset-0 bg-black/40"></div>
         </div>
     {% endif %}
     
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
-        <div class="max-w-3xl">
-            <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold {% if value.background_image %}text-white{% else %}text-fg{% endif %}">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 text-center">
+        <div class="max-w-4xl mx-auto">
+            <!-- Main Headline - Mission/Promise -->
+            <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 font-serif leading-tight mb-8">
                 {{ value.title }}
             </h1>
             
+            <!-- Subheading - How -->
             {% if value.subtitle %}
-                <p class="mt-6 text-xl {% if value.background_image %}text-gray-100{% else %}text-fg-muted{% endif %} max-w-2xl">
+                <p class="text-xl sm:text-2xl text-gray-600 leading-relaxed max-w-3xl mx-auto mb-12">
                     {{ value.subtitle }}
                 </p>
             {% endif %}
             
+            <!-- Primary CTA -->
             {% if value.cta_text and value.cta_link %}
-                <div class="mt-10">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <a href="{{ value.cta_link }}" 
-                       class="inline-flex items-center px-6 py-3 text-base font-medium rounded-lg transition duration-200 
-                              {% if value.cta_style == 'primary' %}
-                                  bg-primary text-white hover:bg-primary-600
-                              {% elif value.cta_style == 'secondary' %}
-                                  bg-white text-primary border-2 border-primary hover:bg-primary hover:text-white
-                              {% else %}
-                                  border-2 {% if value.background_image %}border-white text-white hover:bg-white hover:text-primary{% else %}border-primary text-primary hover:bg-primary hover:text-white{% endif %}
-                              {% endif %}">
+                       class="btn btn-primary text-lg px-8 py-4 min-w-[200px]">
                         {{ value.cta_text }}
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                         </svg>
                     </a>
+                    
+                    <!-- Secondary CTA if available -->
+                    {% if value.secondary_cta_text and value.secondary_cta_link %}
+                        <a href="{{ value.secondary_cta_link }}" 
+                           class="btn btn-outline text-lg px-8 py-4 min-w-[200px]">
+                            {{ value.secondary_cta_text }}
+                        </a>
+                    {% endif %}
                 </div>
             {% endif %}
+            
+            <!-- Trust Indicators -->
+            <div class="mt-16 pt-8 border-t border-gray-200">
+                <p class="text-sm text-gray-500 mb-6">Trusted by leaders at</p>
+                <div class="flex flex-wrap justify-center items-center gap-8 opacity-60">
+                    <!-- Placeholder for client logos -->
+                    <div class="text-gray-400 font-semibold">Company A</div>
+                    <div class="text-gray-400 font-semibold">Company B</div>
+                    <div class="text-gray-400 font-semibold">Company C</div>
+                    <div class="text-gray-400 font-semibold">Company D</div>
+                </div>
+            </div>
         </div>
+    </div>
+    
+    <!-- Scroll indicator -->
+    <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+        <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
     </div>
 </section>

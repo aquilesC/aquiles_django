@@ -1,0 +1,40 @@
+<!-- Why We Do What We Do Section - Design Brief Structure -->
+<section class="py-20 lg:py-24 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto text-center">
+            <!-- Mission Statement -->
+            <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 font-serif mb-8">
+                {{ value.heading|default:"Why We Do What We Do" }}
+            </h2>
+            
+            <!-- Belief Statement -->
+            <p class="text-xl lg:text-2xl text-gray-600 leading-relaxed mb-12 max-w-3xl mx-auto">
+                {{ value.mission_statement }}
+            </p>
+            
+            <!-- Supporting Points -->
+            {% if value.supporting_points %}
+                <div class="grid md:grid-cols-3 gap-8 mb-12">
+                    {% for point in value.supporting_points %}
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ point.title }}</h3>
+                            <p class="text-gray-600">{{ point.description }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Link to deeper page -->
+            {% if value.learn_more_link and value.learn_more_text %}
+                <a href="{{ value.learn_more_link }}" class="btn btn-outline text-lg px-8 py-4">
+                    {{ value.learn_more_text }}
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</section>

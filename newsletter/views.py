@@ -163,8 +163,55 @@ class NewsletterDashboardView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Basic counts
         context["lists"] = SubscriptionList.objects.all()
         context["subscriptions"] = Subscription.objects.select_related("subscription_list").count()
         context["active_subscriptions"] = Subscription.objects.filter(status=Subscription.Status.ACTIVE).count()
         context["pending_subscriptions"] = Subscription.objects.filter(status=Subscription.Status.PENDING).count()
+        
+        # Import Campaign and EmailMessageLog for analytics
+        from .models import Campaign, EmailMessageLog, EmailEvent
+        
+        # Campaign analytics
+        context["total_campaigns"] = Campaign.objects.count()
+        context["draft_campaigns"] = Campaign.objects.filter(status=Campaign.Status.DRAFT).count()
+        context["scheduled_campaigns"] = Campaign.objects.filter(status=Campaign.Status.SCHEDULED).count()
+        context["recent_campaigns"] = Campaign.objects.order_by('-created_at')[:5]
+        
+        # Email performance analytics
+        context["total_emails_sent"] = EmailMessageLog.objects.filter(status=EmailMessageLog.Status.SENT).count()
+        context["emails_delivered"] = EmailMessageLog.objects.filter(status=EmailMessageLog.Status.DELIVERED).count()
+        context["emails_opened"] = EmailMessageLog.objects.filter(status=EmailMessageLog.Status.OPENED).count()
+        context["emails_clicked"] = EmailMessageLog.objects.filter(status=EmailMessageLog.Status.CLICKED).count()
+        context["emails_bounced"] = EmailMessageLog.objects.filter(status=EmailMessageLog.Status.BOUNCED).count()
+        
+        # Calculate rates
+        if context["total_emails_sent"] > 0:
+            context["delivery_rate"] = round((context["emails_delivered"] / context["total_emails_sent"]) * 100, 2)
+            context["open_rate"] = round((context["emails_opened"] / context["total_emails_sent"]) * 100, 2)
+            context["click_rate"] = round((context["emails_clicked"] / context["total_emails_sent"]) * 100, 2)
+            context["bounce_rate"] = round((context["emails_bounced"] / context["total_emails_sent"]) * 100, 2)
+        else:
+            context["delivery_rate"] = 0
+            context["open_rate"] = 0
+            context["click_rate"] = 0
+            context["bounce_rate"] = 0
+        
+        # Recent activity
+        context["recent_emails"] = EmailMessageLog.objects.select_related(
+            'subscriber', 'campaign', 'drip_step'
+        ).order_by('-sent_at')[:10]
+        
+        # Subscription growth (last 30 days)
+        from datetime import timedelta
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        context["new_subscriptions_30d"] = Subscription.objects.filter(
+            created_at__gte=thirty_days_ago
+        ).count()
+        context["active_subscriptions_30d"] = Subscription.objects.filter(
+            status=Subscription.Status.ACTIVE,
+            created_at__gte=thirty_days_ago
+        ).count()
+        
         return context

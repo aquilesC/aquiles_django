@@ -1,14 +1,74 @@
 {% load i18n %}
-{% if background == "muted" %}
-    {% with bg_class="bg-gray-50" text_class="text-gray-900" accent_class="text-gray-600" button_variant="primary" %}
-        {% include "blocks/includes/newsletter_signup.html" %}
-    {% endwith %}
-{% elif background == "primary" %}
-    {% with bg_class="bg-indigo-600" text_class="text-white" accent_class="text-indigo-100" button_variant="light" %}
-        {% include "blocks/includes/newsletter_signup.html" %}
-    {% endwith %}
-{% else %}
-    {% with bg_class="bg-white" text_class="text-gray-900" accent_class="text-gray-600" button_variant="primary" %}
-        {% include "blocks/includes/newsletter_signup.html" %}
-    {% endwith %}
-{% endif %}
+
+<!-- Email/Newsletter CTA - Design Brief Structure -->
+<section class="py-20 lg:py-24 bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <!-- Newsletter Icon -->
+        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-8">
+            <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+        </div>
+        
+        <!-- Heading -->
+        <h2 class="text-4xl lg:text-5xl font-bold text-gray-900 font-serif mb-6">
+            {{ value.heading|default:"Join Optimism Insights" }}
+        </h2>
+        
+        <!-- Value Promise -->
+        <p class="text-xl text-gray-600 leading-relaxed mb-12 max-w-2xl mx-auto">
+            {{ value.description|default:"Get exclusive content, strategic insights, and transformative stories delivered to your inbox. Join leaders who are shaping the future." }}
+        </p>
+        
+        <!-- Newsletter Form -->
+        <form action="{% url 'newsletter:subscribe' %}" method="post" class="max-w-md mx-auto">
+            {% csrf_token %}
+            <input type="hidden" name="source" value="streamfield">
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <input type="hidden" name="allow_multiple" value="{% if allow_multiple %}1{% else %}0{% endif %}">
+            <input type="hidden" name="show_name" value="{% if show_name_fields %}1{% else %}0{% endif %}">
+            <input type="hidden" name="success_message" value="{{ success_message }}">
+            
+            {% if not allow_multiple or value.lists|length <= 1 %}
+                {% for list_id in list_ids %}
+                    <input type="hidden" name="lists" value="{{ list_id }}">
+                {% endfor %}
+            {% endif %}
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex-1">
+                    <label for="{{ form_id }}-email" class="sr-only">Email address</label>
+                    <input 
+                        id="{{ form_id }}-email" 
+                        type="email" 
+                        name="email" 
+                        required 
+                        placeholder="Enter your email address"
+                        class="w-full px-6 py-4 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                    >
+                </div>
+                <button 
+                    type="submit" 
+                    class="btn btn-primary text-lg px-8 py-4 whitespace-nowrap"
+                >
+                    {{ button_text|default:"Subscribe" }}
+                </button>
+            </div>
+            
+            <!-- Privacy Note -->
+            <p class="text-sm text-gray-500 mt-4">
+                We respect your privacy. Unsubscribe at any time.
+            </p>
+        </form>
+        
+        <!-- Trust Indicators -->
+        <div class="mt-12 pt-8 border-t border-gray-200">
+            <p class="text-sm text-gray-500 mb-4">Join thousands of leaders who trust our insights</p>
+            <div class="flex flex-wrap justify-center items-center gap-8 opacity-60">
+                <div class="text-gray-400 font-semibold text-sm">✓ No spam</div>
+                <div class="text-gray-400 font-semibold text-sm">✓ Weekly insights</div>
+                <div class="text-gray-400 font-semibold text-sm">✓ Unsubscribe anytime</div>
+            </div>
+        </div>
+    </div>
+</section>

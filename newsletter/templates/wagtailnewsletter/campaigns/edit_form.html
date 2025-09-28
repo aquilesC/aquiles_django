@@ -1,0 +1,214 @@
+{% extends "wagtailadmin/generic/edit.html" %}
+{% load i18n wagtailadmin_tags %}
+
+{% block content %}
+    {{ block.super }}
+    
+    <!-- Campaign Action Buttons -->
+    <div class="campaign-actions" style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+        <h3>{% trans "Campaign Actions" %}</h3>
+        <div class="action-buttons" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            
+            {% if object.status == 'draft' or object.status == 'cancelled' %}
+                <button type="button" class="button button-primary" onclick="sendCampaign()">
+                    <i class="icon icon-mail"></i> {% trans "Send Now" %}
+                </button>
+                <button type="button" class="button" onclick="scheduleCampaign()">
+                    <i class="icon icon-time"></i> {% trans "Schedule" %}
+                </button>
+            {% endif %}
+            
+            {% if object.status == 'scheduled' %}
+                <button type="button" class="button button-secondary" onclick="cancelCampaign()">
+                    <i class="icon icon-cross"></i> {% trans "Cancel" %}
+                </button>
+            {% endif %}
+            
+            {% if object.status == 'sent' %}
+                <button type="button" class="button" onclick="duplicateCampaign()">
+                    <i class="icon icon-copy"></i> {% trans "Duplicate" %}
+                </button>
+            {% endif %}
+            
+            <button type="button" class="button" onclick="previewCampaign()">
+                <i class="icon icon-view"></i> {% trans "Preview" %}
+            </button>
+        </div>
+        
+        <!-- Campaign Status Info -->
+        <div class="campaign-status" style="margin-top: 1rem;">
+            <strong>{% trans "Status" %}:</strong> 
+            <span class="status-badge status-{{ object.status }}">
+                {{ object.get_status_display }}
+            </span>
+            
+            {% if object.send_at %}
+                <br><strong>{% trans "Scheduled for" %}:</strong> {{ object.send_at|date:"F d, Y H:i" }}
+            {% endif %}
+            
+            {% if object.sent_at %}
+                <br><strong>{% trans "Sent on" %}:</strong> {{ object.sent_at|date:"F d, Y H:i" }}
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 800px; max-height: 80%; overflow-y: auto;">
+            <span class="close" onclick="closePreview()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h2>{% trans "Email Preview" %}</h2>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+    
+    <style>
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-draft { background: #f39c12; color: white; }
+        .status-scheduled { background: #3498db; color: white; }
+        .status-sending { background: #e74c3c; color: white; }
+        .status-sent { background: #27ae60; color: white; }
+        .status-cancelled { background: #95a5a6; color: white; }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+    </style>
+    
+    <script>
+        function sendCampaign() {
+            if (confirm('{% trans "Are you sure you want to send this campaign now?" %}')) {
+                fetch(`{% url 'campaign_action' object.pk 'send' %}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('{% trans "Failed to send campaign" %}');
+                    }
+                });
+            }
+        }
+        
+        function cancelCampaign() {
+            if (confirm('{% trans "Are you sure you want to cancel this campaign?" %}')) {
+                fetch(`{% url 'campaign_action' object.pk 'cancel' %}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('{% trans "Failed to cancel campaign" %}');
+                    }
+                });
+            }
+        }
+        
+        function duplicateCampaign() {
+            if (confirm('{% trans "Are you sure you want to duplicate this campaign?" %}')) {
+                fetch(`{% url 'campaign_action' object.pk 'duplicate' %}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        alert('{% trans "Failed to duplicate campaign" %}');
+                    }
+                });
+            }
+        }
+        
+        function previewCampaign() {
+            fetch(`{% url 'campaign_action' object.pk 'preview' %}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+                
+                document.getElementById('previewContent').innerHTML = `
+                    <div style="border: 1px solid #ddd; padding: 1rem; background: white;">
+                        <h3>Subject: ${data.subject}</h3>
+                        <hr>
+                        <div style="border: 1px solid #eee; padding: 1rem;">
+                            ${data.html_body}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('previewModal').style.display = 'block';
+            })
+            .catch(error => {
+                alert('{% trans "Failed to load preview" %}');
+            });
+        }
+        
+        function closePreview() {
+            document.getElementById('previewModal').style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('previewModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+{% endblock %}

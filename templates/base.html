@@ -6,37 +6,92 @@
     <title>{% block title %}Aquiles Personal Website{% endblock %}</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-white text-gray-900 font-sans leading-relaxed">
     <!-- Navigation -->
-    <nav class="bg-white shadow-sm border-b">
+    <nav class="bg-white/95 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center space-x-8">
-                    <a href="{% url 'core:home' %}" class="text-xl font-semibold text-gray-900">
+            <div class="flex justify-between items-center h-16 md:h-20">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{% url 'core:home' %}" class="text-xl md:text-2xl font-bold text-gray-900 font-serif">
                         Aquiles
                     </a>
-                    {% load menu_tags %}
-                    {% main_menu %}
                 </div>
                 
-                <div class="flex items-center space-x-4">
-                    {% if user.is_authenticated %}
-                        <span class="text-sm text-gray-700">Welcome, {{ user.username }}</span>
-                        <a href="{% url 'accounts:profile' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                            Profile
-                        </a>
-                        <a href="{% url 'accounts:logout' %}" class="text-sm text-red-600 hover:text-red-800">
-                            Logout
-                        </a>
-                    {% else %}
-                        <a href="{% url 'accounts:login' %}" class="text-sm text-blue-600 hover:text-blue-800">
-                            Login
-                        </a>
-                        <a href="{% url 'accounts:register' %}" class="text-sm text-green-600 hover:text-green-800">
-                            Register
-                        </a>
-                    {% endif %}
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-12">
+                    {% load menu_tags %}
+                    <div class="flex items-center space-x-8">
+                        {% main_menu %}
+                    </div>
+                    
+                    <div class="flex items-center space-x-6">
+                        {% if user.is_authenticated %}
+                            <span class="text-sm text-gray-600">Welcome, {{ user.username }}</span>
+                            <a href="{% url 'accounts:profile' %}" class="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200">
+                                Profile
+                            </a>
+                            <a href="{% url 'accounts:logout' %}" class="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                                Logout
+                            </a>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors duration-200">
+                                Login
+                            </a>
+                            <a href="{% url 'accounts:register' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition-colors duration-200">
+                                Get Started
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors duration-200" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <!-- Hamburger icon -->
+                        <svg class="block h-6 w-6" id="menu-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <!-- Close icon -->
+                        <svg class="hidden h-6 w-6" id="close-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile menu -->
+            <div class="md:hidden hidden" id="mobile-menu">
+                <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
+                    {% load menu_tags %}
+                    {% main_menu %}
+                    
+                    <!-- Mobile user menu -->
+                    <div class="pt-4 border-t border-gray-200">
+                        {% if user.is_authenticated %}
+                            <div class="px-3 py-2 text-sm text-gray-600">
+                                Welcome, {{ user.username }}
+                            </div>
+                            <a href="{% url 'accounts:profile' %}" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200">
+                                Profile
+                            </a>
+                            <a href="{% url 'accounts:logout' %}" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200">
+                                Logout
+                            </a>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-200">
+                                Login
+                            </a>
+                            <a href="{% url 'accounts:register' %}" class="block px-3 py-2 text-base font-medium text-white bg-gray-900 hover:bg-gray-800 rounded-md transition-colors duration-200">
+                                Get Started
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -54,29 +109,92 @@
     {% endif %}
 
     <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="min-h-screen">
         {% block content %}
         {% endblock %}
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid md:grid-cols-2 gap-8 mb-8">
-                <div>
-                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-                    {% footer_menu %}
+    <footer class="bg-gray-50 border-t border-gray-100 mt-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid md:grid-cols-4 gap-12 mb-12">
+                <div class="md:col-span-2">
+                    <h3 class="text-2xl font-bold text-gray-900 font-serif mb-4">Aquiles</h3>
+                    <p class="text-gray-600 text-lg leading-relaxed max-w-md">
+                        Empowering leaders and teams to achieve their full potential through strategic guidance and transformative insights.
+                    </p>
                 </div>
-                <div class="text-right">
-                    <h3 class="text-lg font-semibold mb-4">Contact</h3>
-                    <p class="text-gray-300">Get in touch with me</p>
-                    <a href="{% url 'core:home' %}" class="text-blue-400 hover:text-blue-300">Visit Homepage</a>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-6">Quick Links</h4>
+                    <div class="space-y-3">
+                        {% footer_menu %}
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-6">Connect</h4>
+                    <div class="space-y-3">
+                        <a href="{% url 'core:home' %}" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200">Homepage</a>
+                        <a href="#" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200">About</a>
+                        <a href="#" class="block text-gray-600 hover:text-gray-900 transition-colors duration-200">Contact</a>
+                    </div>
                 </div>
             </div>
-            <div class="border-t border-gray-700 pt-8 text-center">
-                <p>&copy; 2025 Aquiles. All rights reserved.</p>
+            <div class="border-t border-gray-200 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-sm">&copy; 2025 Aquiles. All rights reserved.</p>
+                    <div class="mt-4 md:mt-0">
+                        <a href="#" class="text-gray-500 hover:text-gray-700 text-sm mr-6">Privacy Policy</a>
+                        <a href="#" class="text-gray-500 hover:text-gray-700 text-sm">Terms of Service</a>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
+
+    <!-- Mobile Menu JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuIcon = document.getElementById('menu-icon');
+            const closeIcon = document.getElementById('close-icon');
+            
+            if (mobileMenuButton && mobileMenu && menuIcon && closeIcon) {
+                mobileMenuButton.addEventListener('click', function() {
+                    const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                    
+                    // Toggle menu visibility
+                    mobileMenu.classList.toggle('hidden');
+                    
+                    // Toggle icons
+                    menuIcon.classList.toggle('hidden');
+                    closeIcon.classList.toggle('hidden');
+                    
+                    // Update aria-expanded
+                    mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                        mobileMenu.classList.add('hidden');
+                        menuIcon.classList.remove('hidden');
+                        closeIcon.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+                
+                // Close menu on escape key
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape' && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        menuIcon.classList.remove('hidden');
+                        closeIcon.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
