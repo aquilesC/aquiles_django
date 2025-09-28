@@ -1,3 +1,7 @@
+from django.core.cache import caches
+from django.db import connections
+from django.db.utils import OperationalError
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from blog.models import BlogPage
@@ -29,3 +33,36 @@ def members_only_view(request):
         'exclusive_content': "This is exclusive content for members only!",
     }
     return render(request, 'core/members_only.html', context)
+
+
+def healthcheck_view(request):
+    """Lightweight health endpoint for load balancers and uptime checks."""
+
+    checks = {}
+
+    try:
+        with connections['default'].cursor() as cursor:
+            cursor.execute("SELECT 1;")
+            cursor.fetchone()
+        checks['database'] = 'ok'
+    except OperationalError as exc:
+        checks['database'] = f'error: {exc}'
+
+    try:
+        cache = caches['default']
+        cache_key = 'healthcheck'
+        cache.set(cache_key, 'ok', 1)
+        cache.get(cache_key)
+        checks['cache'] = 'ok'
+    except Exception as exc:  # pragma: no cover - defensive
+        checks['cache'] = f'error: {exc}'
+
+    overall_status = all(value == 'ok' for value in checks.values())
+
+    return JsonResponse(
+        {
+            'status': 'ok' if overall_status else 'error',
+            'checks': checks,
+        },
+        status=200 if overall_status else 503,
+    )

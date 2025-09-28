@@ -32,3 +32,6 @@ I want to build a personal website where I can show the things I have done, what
 - git
 - Locally tested
 - Deployed to Digital Ocean
+
+See [`deploy/README.md`](deploy/README.md) for the full container-based workflow,
+including Docker Compose environments, backup procedures, and sync scripts.
